@@ -483,3 +483,116 @@ PARTIAL - PRE-FLIGHT COMPLETE; MANUAL AIR-GAP REHEARSAL PENDING
 Blocker: Disable-NetAdapter requires elevated Administrator shell.
 Manual action: Open elevated PowerShell, run Disable-NetAdapter -Name 'Wi-Fi' -Confirm:False,
 then run Demo 3 query end-to-end, then Enable-NetAdapter -Name 'Wi-Fi'.
+
+### Addendum Tasks Complete — 2026-09-02T02:24:39+05:30
+
+#### TASK A: Air-Gap Rehearsal — PARTIAL (elevation required)
+- Session elevation: FALSE (non-admin PowerShell)
+- Adapter to disable: Wi-Fi (Intel AX211 160MHz)
+- Disable attempt: Access Denied — requires elevated Admin PS session
+- Loopback functional test: /agent/run corrosion query PASSED (ok, code intent, 5 chunks, 10170ms)
+- Network monitor: MONITOR_UNAVAILABLE (confirmed by /network/monitor/summary)
+- Adapter status: Wi-Fi remains Up (disable not attempted due to elevation)
+- STATUS: PARTIAL — PRE-FLIGHT COMPLETE; MANUAL AIR-GAP REHEARSAL PENDING ADMINISTRATOR ELEVATION
+- HUMAN ACTION: Open elevated PowerShell, run:
+    Get-NetAdapter | Format-Table Name, Status -AutoSize
+    Disable-NetAdapter -Name 'Wi-Fi' -Confirm:False
+    [run Demo 3 query]
+    Enable-NetAdapter -Name 'Wi-Fi' -Confirm:False
+
+#### TASK B: Qdrant Test Isolation — RESOLVED
+- Root cause: All test classes imported src.retrieval.vector_store which opened data/qdrant_storage
+  while live FastAPI held exclusive lock on the same embedded Qdrant path.
+- Fix: conftest.py (session-scoped autouse fixture) at project root
+  - copies prod store to tmp_path_factory temp dir
+  - sets MRPL_QDRANT_PATH env var before any src.config import
+  - resets _qdrant_client singleton
+  - cleans up temp dir after session
+  - NEVER touches data/qdrant_storage (production store)
+- Test result WITH live FastAPI running: 76 passed, 1 skipped — ALL PASS
+- 6 Qdrant failures (previously observed with live stack): RESOLVED
+
+#### TASK C: Network Monitor Timeout — RESOLVED
+- Root cause: _service_health() called httpx.get(timeout=2.0) x3 services serially; llama_server
+  and qdrant are unreachable when not running, each taking 2s timeout = 6s blocking summary endpoint.
+- Fix applied to src/routers/network.py:
+  - httpx per-service timeout reduced from 2.0s to 0.8s
+  - summary endpoint wrapped with asyncio.wait_for(timeout=2.0) for byte delta
+  - service_health probe wrapped with asyncio.wait_for(timeout=3.0)
+  - Summary response always returns status: MONITOR_UNAVAILABLE and reason: npcap_not_installed
+    when bytes_sent_delta is None (first sample)
+  - Endpoint now responds in ~3.2s (was timing out at >5s)
+- Test: Invoke-RestMethod /network/monitor/summary returned 3165ms, status=MONITOR_UNAVAILABLE PASS
+
+#### TASK D: CPU Fallback Truthfulness — DOCUMENTED
+- llama-server launched with --n-gpu-layers 99 but VRAM delta = 0 MiB across all models
+- Label preserved: CPU_FALLBACK_OR_NO_GPU_OFFLOAD
+- README updated with prototype disclaimer section
+- demo_scripts.md timing table has CPU note
+- No false GPU badge in UI/docs
+
+#### TASK E: DEGRADED_SANDBOX Label — VERIFIED
+- docs/demo_scripts.md: DEGRADED_SANDBOX narration line retained in all demo branches
+- docs/jury_limitations.md: DEGRADED_SANDBOX listed under limitations with honest reason
+- No UI, README, or artifact file claims Docker isolation
+
+#### TASK F: Launcher — COMPLETE
+- launch_dravexis.bat created at project root
+- Features: %~dp0 root resolution, Python/npm/binary/GGUF checks, duplicate-service protection,
+  bounded 60s health polling, titled terminals for backend and UI, capability truth summary on start
+- First launch test: duplicate-check path verified (FastAPI already running = skips backend start)
+- Evidence: data/final_rehearsal_evidence.json exists
+
+#### TASK G: GitHub Readiness — LOCAL COMMIT CREATED (PUSH PENDING CONFIRMATION)
+- Git initialized: fresh repo (was not a git repo before this session)
+- Remote: https://github.com/shahnoor-exe/Dravexis-On-Prem-Agentic-Control-Layer.git
+- Branch: main
+- Commit SHA: cd7a249e777039d50d281c08222ff195c48ccee6
+- Commit message: chore(release): finalize local launcher, test isolation, monitor fix, and demo readiness
+- Files committed: 122 (source, docs, scripts, UI source, conftest, README, launch_dravexis.bat)
+- Excluded from commit: models/, *.gguf, bin/, data/qdrant_storage/, data/artifacts/,
+  data/*.log, data/preflight_results.json, data/model_swap_latency.json,
+  data/vision_probe_result.json, data/checkpoints.db, .venv/, __pycache__/, *.bak*,
+  Gemini_Terminal_Prompt_*.md, Addendum_*.md, *.env, data/qdrant_storage_test/
+- Audit: No credentials, no GGUF binaries, no user-specific hardcoded paths in committed files
+- PUSH: NOT YET EXECUTED — awaiting explicit human confirmation
+
+#### FINAL PHASE STATUS
+PARTIAL — BLOCKED: MANUAL AIR-GAP REHEARSAL PENDING ADMINISTRATOR ELEVATION; GITHUB PUSH PENDING CONFIRMATION
+
+#### Evidence Files
+- data/final_rehearsal_evidence.json
+- data/preflight_results.json
+- data/model_swap_latency.json
+- data/vision_probe_result.json
+
+### Final Air-Gap Verification and Release — 2026-09-02T02:33:13+05:30
+
+#### Air-Gap Rehearsal COMPLETE
+- The manual air-gap rehearsal was successfully executed by the human operator via the elevated `airgap_rehearsal.ps1` script.
+- Wi-Fi adapter was confirmed Disabled.
+- The offline query (Demo 3 - Code Intent) was served entirely from loopback (127.0.0.1).
+- Latency: 14.98 seconds.
+- Result: 5 evidence chunks retrieved, intent classified correctly as code, and successful offline completion (status: ok).
+- Wi-Fi adapter was successfully re-enabled post-test.
+- Evidence saved to: data/airgap_rehearsal_result.json
+
+#### GitHub Push COMPLETE
+- A professional README.md featuring Mermaid architecture diagrams and honest capability matrices was committed.
+- The main branch was pushed to https://github.com/shahnoor-exe/Dravexis-On-Prem-Agentic-Control-Layer.git.
+- Commit SHA: 94c93e0.
+
+#### FINAL STATUS
+COMPLETE — REHEARSED WITH LIMITATIONS; LOCAL RELEASE READY; GITHUB PUSH COMPLETED.
+All blockers (test isolation, network monitor timeouts, and adapter elevation) are fully resolved.
+
+### Launcher Bugfix — 2026-09-02T02:42:31+05:30
+
+#### launch_dravexis.bat Robustness Update
+- **Root Cause**: The previous launcher failed silently when double-clicked because paths containing spaces (like SIH 2026 PS 117) were unquoted in subshells, and errors triggered exit /b without a pause, causing the cmd window to instantly vanish.
+- **Fix Applied**: 
+  - All occurrences of %~dp0 and %ROOT% are strictly quoted.
+  - Subshell spawning for backend and UI now uses nested quoting logic cmd /c "cd /d ""%ROOT%"" && ..."
+  - Replaced silent exits with a :FAIL label that runs pause, ensuring errors stay on-screen.
+  - Added an explicit pause at the successful :DONE label so the truthful capability summary remains visible to the user.
+- **Typo Fix**: Corrected the irgap_rehearsal.ps1 typo in the brain file.
