@@ -1,0 +1,22 @@
+# Sovereign Agentic AI Workbench — Phase 1 + Phase 2 Dependencies
+# Install with: pip install -r requirements.txt
+
+# --- Phase 1 (already installed) ---
+fastapi>=0.132.0
+uvicorn[standard]>=0.41.0
+pydantic>=2.12.0
+pydantic-settings>=2.0.0
+pymupdf>=1.28.0          # PyMuPDF (fitz)
+pymupdf4llm              # PyMuPDF LLM helper (to_markdown)
+httpx>=0.28.0
+aiohttp>=3.13.0
+psutil>=7.0.0
+requests>=2.32.0
+qdrant-client[fastembed]>=1.14.0   # Qdrant embedded + FastEmbed + BGE-M3
+
+# --- Phase 2 additions ---
+langgraph>=0.2.0                     # LangGraph StateGraph
+langgraph-checkpoint-sqlite>=2.0.0   # SqliteSaver for session persistence
+langchain-core>=0.2.0                # Required by langgraph
+onnxruntime>=1.18.0                  # ONNX router (CPU-only, optional)
+docker>=7.0.0                        # Sandbox probe (graceful fail if Docker absent)

@@ -1,0 +1,48 @@
+/* index.css — Tailwind + dark theme base */
+@import "tailwindcss";
+
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+  background: #09090b;
+  color: #f4f4f5;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #18181b; }
+::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+/* Textarea */
+textarea { font-family: inherit; }
+
+/* React Flow dark theme override */
+.react-flow__background { background: #18181b !important; }
+.react-flow__controls-button { background: #27272a; border-color: #3f3f46; color: #a1a1aa; }
+.react-flow__controls-button:hover { background: #3f3f46; }
+
+/* Pulse animation for active nodes */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Line-clamp utility */
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

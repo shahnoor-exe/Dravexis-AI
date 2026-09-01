@@ -1,0 +1,67 @@
+MRPL Standard Operating Procedure — Flare System Operations
+Document No: MRPL-OPS-SOP-007 (Illustrative Synthetic Demo Excerpt)
+
+1. PURPOSE
+
+This Standard Operating Procedure (SOP) defines the operational requirements, safety interlocks, and emergency procedures for the flare header system and flare tip at Mangalore Refinery and Petrochemicals Limited (MRPL). The flare system receives relief discharges from all process units and provides safe disposal of hydrocarbon gases via controlled combustion.
+
+2. SCOPE
+
+This SOP applies to all process operators, shift supervisors, and instrument technicians working in units connected to the main refinery flare header at MRPL, Unit 4 and Unit 5 process areas.
+
+3. OPERATING CONDITIONS
+
+3.1 Normal Operating Parameters
+
+    Parameter                        Value
+    -------------------------------- ------------------------------------------
+    Flare header pressure            0 – 0.5 bar g (normal quiescent flow)
+    Pilot gas supply pressure        3.0 – 4.5 bar g (fuel gas)
+    Knock-out drum (KOD) liquid level  Less than 30% (alarm at 50%, trip at 70%)
+    Purge gas (N₂) flow to flare tip  Minimum 200 Nm³/h continuously
+    Flare tip temperature (IR camera) 700 – 1100°C during active combustion
+
+3.2 Alarm and Trip Setpoints
+
+    - KOD high-level alarm:        50% → alert operator
+    - KOD high-high level trip:    70% → auto-activate KOD pump, isolate secondary headers
+    - Pilot flame failure alarm:   3 consecutive thermocouples show < 600°C for > 10 seconds → re-ignition attempt
+    - Pilot flame loss trip:       All pilot thermocouples < 400°C for > 30 seconds → sound major alarm, notify shift supervisor, initiate emergency re-ignition
+    - Header back-pressure high:   > 1.5 bar g → alert control room, identify source of excess relief
+    - Header back-pressure high-high: > 2.5 bar g → automatic diversion to secondary flare (if commissioned)
+
+4. START-UP PROCEDURE — FLARE IGNITION
+
+4.1 Pre-ignition Checks
+    a. Verify N₂ purge flow is at minimum 200 Nm³/h.
+    b. Confirm KOD liquid level < 30%.
+    c. Verify fuel gas supply pressure is 3.0 – 4.5 bar g at the pilot gas header.
+    d. Check all pilot flame thermocouples are functioning (no bad actor tags).
+
+4.2 Ignition Sequence
+    a. Open pilot gas isolation valve (XV-F-001) locally.
+    b. Activate electronic igniter from DCS (HIC-F-001) — three ignition attempts maximum.
+    c. Confirm flame establishment via thermocouple reading > 700°C within 15 seconds.
+    d. If ignition fails after 3 attempts: purge for 5 minutes with N₂ before re-attempting.
+
+5. EMERGENCY SHUTDOWN — PILOT FLAME LOSS
+
+5.1 Upon confirmed pilot flame loss alarm:
+    a. Do NOT close header block valves — this will cause overpressure in relief headers.
+    b. Notify shift supervisor and terminal manager immediately.
+    c. Attempt re-ignition per Section 4.2.
+    d. If re-ignition fails within 15 minutes, initiate a controlled rate reduction of process unit throughputs to minimise relief load.
+    e. Contact fire station (ext. 2222) and keep on standby.
+
+5.2 During a pilot-flame-loss event, all visible smoke emissions shall be monitored from the perimeter. If black smoke is observed exceeding CPCB opacity standards (> 25% opacity by Ringelmann scale), notify the MRPL Environmental department and KSPCB within 1 hour.
+
+6. PURGE GAS REQUIREMENTS
+
+The minimum purge gas rate of 200 Nm³/h MUST be maintained at all times to prevent air ingress into the flare header. Air ingress can create an explosive mixture in the header, which presents a severe risk of detonation.
+
+    Lower Explosive Limit (LEL) for typical refinery tail gas: ~4% v/v in air
+    Minimum purge rate calculation basis: maintain oxygen concentration < 0.5% v/v at flare tip
+
+7. MAINTENANCE EXCLUSION ZONES
+
+No hot work or ignition sources shall be permitted within 60 metres of the base of the flare stack during normal operation. During commissioning or decommissioning of the flare tip, the exclusion zone extends to 150 metres.

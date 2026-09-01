@@ -1,0 +1,46 @@
+ASME PCC-2 Article 2.1 — Composite Reinforcement Repair Methods
+Synthetic reference for MRPL equipment repair demonstration.
+
+SECTION 1 — SCOPE AND APPLICABILITY
+
+This article covers composite wrap repair systems for metallic pressure equipment with:
+- Local internal/external corrosion defects
+- Mechanical damage (dents, gouges) not exceeding 40% of wall thickness
+- Operating temperature range: -29°C to +93°C (standard repair)
+- Maximum operating pressure: per manufacturer qualification test
+
+Inapplicable conditions (must use other methods):
+- Defect exceeding 80% wall loss — requires metal insert or spool replacement
+- Operating temperature >121°C — requires high-temperature composite qualification
+- Leak-before-break defects — composite wraps are NOT leak seals; defect must be dry
+
+SECTION 2 — DESIGN CALCULATION (ASME PCC-2 Eq. 2.1-3)
+
+Minimum composite thickness t_c:
+  t_c = (P × D) / (2 × S_c × E_c) - t_remaining
+
+Where:
+  P = operating gauge pressure (MPa)
+  D = pipe outer diameter (mm)
+  S_c = composite laminate allowable stress (MPa) from coupon testing
+  E_c = composite repair efficiency factor (0.65 for manual wet layup; 0.80 for prepreg)
+  t_remaining = remaining metal wall thickness (mm)
+
+SYNTHETIC MRPL EXAMPLE — Line 4B-CS-150-N1A (CDU overhead):
+  P = 0.95 MPa, D = 168.3 mm, t_nominal = 7.11 mm, t_remaining = 4.2 mm
+  S_c = 48 MPa (glass/epoxy, wet layup), E_c = 0.65
+  t_c = (0.95 × 168.3) / (2 × 48 × 0.65) - 4.2 = 2.55 mm (minimum composite layers = 4)
+
+SECTION 3 — INSPECTION INTERVALS FOR REPAIRED PIPE
+
+First inspection post-repair: 12 months (visual + acoustic emission)
+Subsequent inspections: 3-year interval
+Maximum qualified service life for composite repair: 20 years (per ISO 24817)
+Condition for extension beyond 20 years: full recertification testing of witness coupons
+
+SECTION 4 — SYNTHETIC MRPL ACTIVE REPAIRS REGISTER
+
+Line 4B-CS-150-N1A: Repair date 2024-07-15, 6 layers glass/epoxy, contractor Furmanite India
+Line 2A-CS-200-N2C: Repair date 2025-01-20, 8 layers, defect 35% wall loss
+
+DISCLAIMER: Synthetic demonstration document. Not a design standard or statutory guidance.

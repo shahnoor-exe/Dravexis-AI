@@ -1,0 +1,48 @@
+OISD Standard 118 — Layouts for Oil and Gas Installations
+Third Revision — Section 8: Fire Protection Systems (Illustrative Excerpt for Demo Purposes)
+
+8. FIRE PROTECTION IN PETROLEUM REFINERIES
+
+8.1 SCOPE
+
+This section covers the minimum requirements for fire detection, alarm, and suppression systems in petroleum refineries, including fixed water spray systems, foam systems, and gas suppression systems for enclosed spaces.
+
+8.2 WATER SPRAY SYSTEMS FOR PRESSURE VESSELS AND STORAGE TANKS
+
+8.2.1 Fixed water spray systems shall be provided for all pressure vessels containing flammable hydrocarbons above their auto-ignition temperature or operating above 60°C with a design pressure exceeding 10 kg/cm².
+
+8.2.2 The minimum water application rate for cooling of pressure vessels exposed to fire shall be:
+    - Wetted surface: 10.2 L/min/m² (0.25 gpm/ft²)
+    - Unwetted surface (drainage plane): 4.1 L/min/m² (0.10 gpm/ft²)
+
+8.2.3 The water spray system for a vessel shall be capable of operating for a minimum duration of 60 MINUTES without replenishment from external sources.
+
+8.3 FOAM SYSTEMS FOR ATMOSPHERIC STORAGE TANKS
+
+8.3.1 Fixed foam systems (top-pouring or sub-surface injection) shall be provided for all atmospheric storage tanks with a capacity exceeding 1,000 KL containing Class A or Class B petroleum products.
+
+8.3.2 The foam solution application rate shall be:
+    - Class A products (flash point < 23°C): Minimum 6.5 L/min/m² of liquid surface area
+    - Class B products (23°C ≤ flash point < 65°C): Minimum 4.1 L/min/m² of liquid surface area
+
+8.3.3 Foam concentrate quantity shall be sufficient for 30 MINUTES of continuous operation at the design application rate, with a 100% backup supply maintained on site.
+
+8.4 FIRE DETECTION SYSTEMS
+
+8.4.1 A combination of point-type heat detectors, UV/IR flame detectors, and combustible gas detectors shall be installed in all process areas.
+
+8.4.2 Combustible gas detectors shall be set to alarm at 10% of the Lower Explosive Limit (LEL) and trip safety systems at 20% LEL.
+
+8.4.3 The fire and gas detection system shall be integrated with the Safety Instrumented System (SIS) and shall initiate automatic shutdown of relevant process units upon confirmed detection.
+
+8.5 SPACING REQUIREMENTS — SAFETY DISTANCES
+
+Minimum safety distances between process equipment in petroleum refineries:
+    - Fired heater to flammable liquid storage: 30 m
+    - Compressor to fired heater: 15 m
+    - Flare stack to process equipment: 60 m (based on radiation calculation, whichever is greater)
+    - Control room to process unit boundary: 30 m minimum; blast-resistant design if < 60 m
+
+8.6 PASSIVE FIRE PROTECTION
+
+All structural steel within 15 m of fired equipment or storage tanks containing Class A/B products shall be provided with fireproofing rated for a minimum of TWO (2) HOURS at 1093°C (UL 1709 or equivalent standard).

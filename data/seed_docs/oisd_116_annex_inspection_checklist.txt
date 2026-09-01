@@ -1,0 +1,52 @@
+OISD 116 — Annexure: Inspection Checklist for Static Equipment
+Synthetic reference checklist for MRPL demonstration.
+
+PRESSURE VESSEL PRE-INSPECTION CHECKLIST (OISD-116 Annex C)
+
+Equipment Tag: ___________________  Equipment Type: ___________________
+Unit: ___________________  P&ID No.: ___________________
+Inspection Date: ___________________  Inspector ID: ___________________
+
+SECTION A — DOCUMENTATION REVIEW
+[ ] Previous inspection report reviewed and deficiencies closed
+[ ] Design data sheet available: design pressure, temperature, material, corrosion allowance
+[ ] Repair history and NDE records from last inspection cycle on file
+[ ] HAZOP/LOPA recommendations implemented and documented
+[ ] Current CML (Corrosion Monitoring Location) map matches physical vessel
+
+SECTION B — EXTERNAL VISUAL
+[ ] Insulation condition: no wet spots, bulging, or damaged cladding
+[ ] External surface free from visible corrosion, blistering, cracking
+[ ] Support legs/lugs/skirts: no base-plate cracking or soil corrosion
+[ ] Nozzle flanges: bolting complete, gasket face condition acceptable
+[ ] Relief valves: tag number matches, PSV test date within 2 years
+
+SECTION C — INTERNAL VISUAL (on entry permit)
+[ ] Shell internal: no pitting >2 mm depth without UT confirmation
+[ ] Weld seams: no undercut, cracks, or disbondment visible
+[ ] Internals (trays, demisters, internals): mechanical integrity acceptable
+[ ] Bottom sump/boot: no significant corrosion or sediment build-up
+[ ] Nozzle bore: no corrosion product or restriction in outlet nozzles
+
+SECTION D — UT THICKNESS MEASUREMENTS
+[ ] CML readings completed per approved map
+[ ] All readings ≥ t_minimum (retirement thickness per API 510)
+[ ] Average corrosion rate calculated from previous two inspection cycles
+[ ] Next inspection date calculated: t_remaining / corrosion_rate × safety_factor
+[ ] Reading sheet attached and signed by inspector
+
+SECTION E — REMAINING LIFE CALCULATION
+Formula: RL = (t_measured - t_min) / CR_annual
+
+Synthetic Example:
+  t_measured = 8.2 mm, t_min = 6.0 mm, CR = 0.30 mm/yr
+  RL = (8.2 - 6.0) / 0.30 = 7.33 years
+
+Next inspection = min(RL/2, OISD interval) = min(3.67 yr, 5 yr) = 3.67 years
+
+SECTION F — SIGN-OFF
+Inspector: ___________________ Date: ___________________
+Reviewer: ___________________ Date: ___________________
+Area Authority: _______________ Date: ___________________
+
+DISCLAIMER: Synthetic checklist for demonstration. Not a live MRPL inspection record.

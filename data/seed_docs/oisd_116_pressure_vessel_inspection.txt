@@ -1,0 +1,56 @@
+OISD Standard 116 — Inspection of Pressure Vessels in Petroleum Industry
+Third Revision (Illustrative Excerpt for Demo Purposes)
+
+1. SCOPE
+
+This standard applies to the inspection of unfired pressure vessels in petroleum refineries and petrochemical plants operating in India. It covers the frequency of inspection, types of inspection, inspection methods, and acceptance criteria for pressure vessels operating under internal or external pressure.
+
+2. DEFINITIONS
+
+2.1 Internal Inspection: An examination of the internal surfaces of a pressure vessel, normally conducted during a shutdown when the vessel has been depressurized, emptied, purged, and made safe for entry.
+
+2.2 External Inspection: An examination of the external surfaces of a pressure vessel, including insulation, supports, nozzles, and appurtenances, which may be conducted while the vessel is in service.
+
+2.3 Thickness Measurement: Non-destructive measurement of the remaining wall thickness using ultrasonic testing (UT) or radiography.
+
+3. INSPECTION INTERVALS
+
+3.1 General — The inspection interval for a pressure vessel shall be based on the corrosion rate, the calculated safe remaining life, and the type of service.
+
+3.2 Internal Inspection Intervals
+
+(a) For pressure vessels in general refinery service, the maximum interval between internal inspections shall not exceed TEN (10) YEARS, provided the corrosion allowance has not been consumed below the minimum required thickness.
+
+(b) Where the calculated remaining life is less than 4 years, the interval shall not exceed HALF the remaining life.
+
+(c) For hydrogen service vessels operating above 200°C (HIC/SOHIC susceptibility zones), the maximum internal inspection interval shall be reduced to FIVE (5) YEARS regardless of corrosion rate.
+
+(d) For vessels containing H2S in wet service, inspection shall conform to NACE MR0175 / ISO 15156, and internal inspection intervals shall not exceed FIVE (5) YEARS.
+
+3.3 External Inspection Intervals
+
+External inspections shall be conducted at intervals not exceeding FIVE (5) YEARS for all pressure vessels, or annually for vessels under insulation in wet or corrosive environments (CUI risk).
+
+3.4 Thickness Measurement Frequency
+
+Ultrasonic thickness measurements shall be taken at each internal inspection and documented in the vessel inspection record. A minimum of 8 reading locations per vessel shell course is required.
+
+4. ACCEPTANCE CRITERIA
+
+4.1 A pressure vessel found to have remaining wall thickness below the calculated Minimum Required Thickness (MRT) shall be immediately taken out of service and evaluated for fitness for purpose per API 579-1/ASME FFS-1.
+
+4.2 The MRT for a cylindrical shell under internal pressure is:
+
+    MRT = (P × R) / (S × E - 0.6 × P)
+
+    Where:
+        P = Maximum Allowable Working Pressure (MAWP), psi
+        R = Inside radius, in
+        S = Allowable stress at design temperature, psi
+        E = Joint efficiency
+
+4.3 A corrosion rate exceeding 0.25 mm/year triggers a mandatory re-assessment of the inspection interval.
+
+5. DOCUMENTATION
+
+Every pressure vessel in a petroleum refinery shall have a vessel register maintained by the plant inspection department. The register shall contain: vessel tag number, design code, design pressure and temperature, MAWP, material of construction, year of manufacture, inspection history, thickness measurement data, and fitness-for-purpose evaluations.

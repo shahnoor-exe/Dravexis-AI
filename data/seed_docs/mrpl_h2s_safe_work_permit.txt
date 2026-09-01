@@ -1,0 +1,40 @@
+MRPL H2S Safe Work Permit Procedure — SWP-H2S-002 Rev 5
+Synthetic internal permit for demonstration purposes only.
+
+1. SCOPE AND APPLICABILITY
+This procedure governs all activities in areas classified as H2S-risk zones within MRPL.
+Applies to: maintenance, inspection, sampling, and construction activities in CDU, HCU, and FCC.
+
+2. H2S RISK CLASSIFICATION
+
+Zone Class | H2S Concentration | PPE Minimum  | Entry Requirement
+Class I    | 0–1 ppm           | H2S detector | Normal access with detector
+Class II   | 1–10 ppm          | SCBA standby | Permit required, 2-person rule
+Class III  | >10 ppm           | SCBA mandatory | Hot work restricted; emergency only
+
+3. PERMIT REQUIREMENTS
+
+Standard H2S Work Permit (SWP-H2S-002):
+- Issuer: Area Operations Technician + Safety Officer countersign
+- Validity: 12 hours per shift; must be renewed for each shift
+- Wind sock check: mandatory before entry — work facing upwind
+- Rescue plan: identified standby with SCBA before permit issue
+
+Continuous gas monitoring requirements:
+- Portable H2S detector: calibrated within 30 days
+- Fixed detectors must be operational and alarming at 1 ppm (first alarm)
+- At 10 ppm alarm: work stops, non-essential personnel evacuate, supervisor notified
+
+4. SYNTHETIC MRPL H2S INCIDENT HISTORY (for context only)
+
+2023-11-02: Near-miss, CDU-V-103 manway opening — H2S 8 ppm detected; evacuation executed correctly
+2024-05-17: H2S exceedance 12 ppm, FCC stripper area — permit revoked; investigation: sampling valve left open
+Root causes addressed: double-block-and-bleed required for all open sampling in H2S service as of 2024-06-01.
+
+5. EMERGENCY RESPONSE
+
+Assembly point: Muster Station M-3 (North Gate) — 200 m upwind of CDU
+Emergency contact: Shift Control Room +91-824-2270-200 (24 hours)
+MRPL Medical Centre: 300 m from CDU battery limit, 24-hour staffing
+
+DISCLAIMER: Synthetic safe work permit document for demonstration only. Not a live MRPL permit.

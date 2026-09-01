@@ -1,0 +1,70 @@
+ASME B31.3 — Process Piping Code
+2022 Edition — Chapter II: Design (Illustrative Excerpt for Demo Purposes)
+
+302. DESIGN CONDITIONS
+
+302.1 Design Pressure
+
+302.1.1 The design pressure of each component in a piping system shall be not less than the maximum sustained operating pressure (MSOP) including the effect of static head of fluid where significant.
+
+302.1.2 For systems subject to pressure surges (water hammer, pump shutdown), the design pressure shall account for the maximum surge pressure.
+
+302.2 Design Temperature
+
+302.2.1 The design temperature for each component shall be the temperature at which the component is designed to operate, based on the maximum expected fluid or ambient temperature, whichever is greater.
+
+302.2.2 For uninsulated components, the metal temperature may be taken as 85% of the maximum process fluid temperature unless calculated otherwise by heat transfer analysis.
+
+302.2.3 The minimum design temperature shall be the lowest temperature at which the piping is required to be capable of carrying its design pressure.
+
+303. PRESSURE DESIGN OF COMPONENTS
+
+303.1 Straight Pipe Under Internal Pressure
+
+The minimum required wall thickness for straight pipe under internal pressure is given by:
+
+    t_m = (P × D) / (2 × (SE + PY))   [Equation 3a]
+
+    Where:
+        t_m = Minimum required wall thickness (mm or in)
+        P   = Internal design pressure (MPa or psi)
+        D   = Outside diameter of pipe (mm or in)
+        S   = Allowable stress value from Table A-1 (MPa or psi)
+        E   = Longitudinal joint quality factor (dimensionless, from Table A-1B)
+        Y   = Coefficient from Table 304.1.1 (temperature-dependent)
+
+    For temperatures below 480°C (900°F), Y = 0.4 for ferritic steels.
+    For temperatures 480°C to 565°C, Y = 0.5.
+    For temperatures above 565°C, Y = 0.7.
+
+303.2 Wall Thickness Tolerance
+
+The specified wall thickness of pipe shall be the minimum required thickness t_m plus a mill tolerance of 12.5% (for seamless pipe) or as stated in the applicable pipe specification.
+
+304. ALLOWABLE STRESS AND TEMPERATURE LIMITS
+
+304.1 Pressure-Temperature Ratings
+
+Components conforming to listed standards (e.g., ASME B16.5 flanges) may be used at pressures and temperatures not exceeding those tabulated in the applicable standard for the material and rating class.
+
+304.1.1 For ASME B16.5 Class 300 flanges in carbon steel (Group 1.1):
+    - Maximum allowable pressure at 38°C (100°F): 51.1 bar (740 psi)
+    - Maximum allowable pressure at 260°C (500°F): 41.4 bar (600 psi)
+    - Maximum allowable pressure at 454°C (850°F): 26.2 bar (380 psi)
+
+304.2 High-Temperature Limitations
+
+Process piping operating above 427°C (800°F) shall be subjected to mandatory creep analysis per Appendix V of ASME B31.3. The material shall demonstrate adequate rupture ductility as per ASME Section II, Part D.
+
+305. FLEXIBILITY AND SUPPORT
+
+305.1 A piping system shall have sufficient flexibility to prevent thermal expansion or contraction from causing pipe failure by overstress, damage to connected equipment, or leakage at joints.
+
+305.2 Expansion loops, offsets, or flexible connections shall be provided where the calculated sustained stress (SL) combined with thermal expansion stress (SE) exceeds the allowable stress range SA:
+
+    SA = f × (1.25 × Sc + 0.25 × Sh)
+
+    Where:
+        Sc = Basic allowable stress at cold (installation) temperature
+        Sh = Basic allowable stress at hot (operating) temperature
+        f  = Stress range reduction factor (1.0 for ≤7,000 cycles)

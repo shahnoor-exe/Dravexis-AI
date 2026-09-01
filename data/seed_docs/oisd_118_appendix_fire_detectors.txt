@@ -1,0 +1,38 @@
+OISD 118 — Appendix on Fire and Gas Detection Systems (MRPL Demo Supplement)
+Synthetic reference document for demonstration purposes only.
+
+SECTION A — FIXED GAS DETECTOR PLACEMENT (OISD-118 Annex B)
+
+B.1 General Requirements
+Fixed combustible gas detectors shall be installed in enclosed or semi-enclosed areas where flammable gas or vapour can accumulate.
+Detector spacing: Maximum 5 metres apart in high-risk zones; 10 metres in low-risk zones.
+Coverage per detector head: 50 m² (H2S service); 80 m² (HC vapour service).
+
+B.2 Alarm Setpoints (OISD-118 Table B-2)
+First alarm (alert): 10% LEL (Lower Explosive Limit)
+Second alarm (action): 20% LEL
+Emergency shutdown trigger: 40% LEL
+Toxic gas (H2S) first alarm: 1 ppm (TLV-TWA)
+H2S second alarm: 10 ppm
+H2S IDLH threshold: 50 ppm
+
+B.3 Detector Technology Selection
+Areas with H2S service: Electrochemical cells mandatory; catalytic bead NOT acceptable due to H2S poisoning.
+Areas with methane/propane service: Catalytic bead acceptable; IR open-path preferred in large open areas.
+Voting logic: 1-of-2 for alert; 2-of-3 for emergency shutdown in safety-critical areas.
+
+SECTION B — HEAT DETECTOR PLACEMENT (OISD-118 Annex C)
+
+C.1 Rate-of-rise detectors: Sensitive to 8.5°C/min rise rate; trigger at absolute 57°C.
+C.2 Fixed temperature detectors: 68°C in process buildings; 93°C in pump houses.
+C.3 Hydrocarbon pool fire: Response time requirement ≤ 30 seconds to first alarm.
+
+SECTION C — SYNTHETIC MRPL SITE DATA (not from OISD 118)
+
+MRPL CDU area detector count: 48 (H2S electrochemical) + 32 (HC catalytic)
+MRPL FCC area: 24 IR open-path + 12 H2S point detectors
+Last calibration date: 2026-03-15
+Next calibration due: 2026-09-15
+Calibration gas: isobutane 2.5% LEL, H2S 25 ppm
+
+DISCLAIMER: Synthetic demonstration values only. Not statutory compliance data.

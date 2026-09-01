@@ -1,0 +1,43 @@
+MRPL Corrosion Inspection Procedure — COR-INSP-001 Rev 3
+Synthetic internal procedure document for demonstration purposes only.
+
+1. SCOPE
+This procedure covers corrosion inspection methodology for static equipment in MRPL refinery process units:
+CDU (Crude Distillation Unit), Hydrocracker (HCU), and FCC (Fluid Catalytic Cracker).
+
+2. INSPECTION TECHNIQUES (prioritised by defect type)
+
+2.1 Ultrasonic Thickness Measurement (UTM)
+Equipment: Krautkramer DM5E with V103 transducer (5 MHz, straight beam)
+Grid spacing: 50 mm × 50 mm in general areas; 25 mm × 25 mm at weld toes
+Minimum scan area: all grid points within 300 mm of any CML (Corrosion Monitoring Location)
+Acceptance: measured thickness ≥ t_min (per ASME B31.3 design calculation)
+
+2.2 Phased Array Ultrasonic Testing (PAUT)
+Use when: pitting index > 0.3 (scattered pitting detected by UTM)
+Equipment: Olympus OmniScan MX2, 5L16-A10 probe
+Resolution: ≤ 1 mm lateral; ≤ 0.5 mm depth
+
+2.3 Automated Ultrasonic (AUT) Scanning for CUI (Corrosion Under Insulation)
+Trigger: pipe operating temperature 60–120°C in wet climate zone
+Method: LRUT (Long Range Ultrasonic Testing) for screening, UTM for confirmation
+
+3. SYNTHETIC MRPL CORROSION RATE DATA (2024–2026 campaign)
+
+Equipment      | Material | Service    | Measured Rate | Basis
+CDU-V-101      | CS       | Crude      | 0.22 mm/yr   | 3-year UT trend
+CDU-V-103      | CS       | H2S wet    | 0.31 mm/yr   | 2-year UT trend
+HCU-E-204      | SS 316L  | H2 rich    | 0.04 mm/yr   | Passive
+FCC-D-301      | CS       | Coke slurry| 0.45 mm/yr   | Accelerated erosion-corrosion
+
+Inspection intervals apply per OISD 116 risk classification:
+- Risk Class A (H2S wet service): 5-year inspection interval, 2-year UT spot check
+- Risk Class B (Non-lethal service): 10-year inspection interval, 5-year UT spot check
+- Risk Class C (Low energy, ambient): 15-year inspection interval
+
+4. SAFE WORK REQUIREMENTS
+- Gas test mandatory before entry: O2 ≥ 19.5%, LEL ≤ 10%, H2S ≤ 1 ppm TWA
+- Scaffold inspection certificate required if > 3 m elevation
+- Radiation permit required for gamma radiography; 15 m exclusion zone mandatory
+
+DISCLAIMER: Synthetic internal procedure for demonstration. Not a live MRPL document.

@@ -1,0 +1,90 @@
+# Sovereign Agentic AI Workbench — .gitignore
+
+# --- Models (large binary files) ---
+models/
+*.gguf
+*.bin
+*.safetensors
+
+# --- Vector store (on-disk Qdrant) ---
+data/qdrant_storage/
+
+# --- Logs ---
+data/*.log
+*.log
+
+# --- Evidence output ---
+data/test_rag_evidence.json
+
+# --- Downloaded binaries ---
+bin/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+
+# --- Environment ---
+.env
+*.env.local
+
+# --- IDE ---
+.vscode/
+.idea/
+*.sublime-*
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Frontend / Node ---
+ui/**/node_modules/
+ui/**/dist/
+ui/**/build/
+ui/**/.next/
+ui/**/target/          # Rust/Tauri build artefacts
+
+# --- Backup files created by agent sessions ---
+*.bak.*
+*.bak
+
+# --- Evidence and preflight output (non-sensitive derived data; keep for local only) ---
+data/preflight_results.json
+data/vision_probe_result.json
+data/model_swap_latency.json
+data/final_rehearsal_evidence.json
+data/final_launcher_verification.json
+data/llama_server.log
+
+# --- Seed doc backups ---
+data/seed_docs/*.bak*
+
+# --- Script backups ---
+scripts/*.bak*
+
+# --- Non-redistributable standards / private MRPL material ---
+data/seed_docs/*.pdf
+data/seed_docs/*.docx
+
+# --- Generated agent artifacts (runtime outputs, not source) ---
+data/artifacts/
+data/qdrant_storage_test/
+data/checkpoints.db
+data/phase*_verification_evidence.json
+data/*.log
+
+# --- Gemini_Terminal_Prompt files (not source code) ---
+Gemini_Terminal_Prompt_*.md
+Addendum_*.md
+
+# --- Script one-off backup files ---
+scripts/*.backup
