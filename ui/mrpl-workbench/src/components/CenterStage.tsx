@@ -175,15 +175,19 @@ export const CenterStage: React.FC = () => {
               </div>
             )}
             {finalAnswer && (
-              <div data-anim="answer-panel" className="bg-zinc-900/60 border border-neon-cyan/30 rounded-xl p-6 shadow-[0_0_20px_rgba(0,240,255,0.05)] backdrop-blur-md relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-neon-cyan"></div>
+              <div data-anim="answer-panel" className="bg-zinc-900/60 border border-neon-cyan/30 rounded-xl p-6 shadow-[0_0_20px_rgba(0,240,255,0.1)] backdrop-blur-md relative overflow-hidden animate-fade-in">
+                <div className="absolute top-0 left-0 w-1 h-full bg-neon-cyan glow-cyan"></div>
                 <div className="flex items-center gap-3 mb-5 pb-3 border-b border-zinc-800/80">
-                  <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded bg-black/50 ${runStatus === "partial" ? "text-neon-amber border border-neon-amber/50" : "text-neon-emerald border border-neon-emerald/50"}`}>
+                  <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded bg-black/50 ${runStatus === "partial" ? "text-neon-amber border border-neon-amber/50 glow-amber" : "text-neon-emerald border border-neon-emerald/50 glow-emerald"}`}>
                     {runStatus === "partial" ? "⚠ PARTIAL OUTPUT" : "✓ EXECUTION SUCCESS"}
                   </span>
                   {intent && <span className="text-[10px] font-mono text-neon-cyan">MODE: {intent}</span>}
                 </div>
-                <div className="text-zinc-200 text-sm leading-relaxed whitespace-pre-wrap font-sans">{finalAnswer}</div>
+                <div className="text-neon-cyan/90 text-sm leading-relaxed whitespace-pre-wrap font-mono relative">
+                  <div className="absolute -left-3 top-0 bottom-0 border-l border-neon-cyan/20"></div>
+                  {finalAnswer}
+                  <span className="inline-block w-2 h-4 bg-neon-cyan ml-1 animate-pulse align-middle"></span>
+                </div>
               </div>
             )}
             {runStatus === "partial" && !finalAnswer && (

@@ -35,6 +35,7 @@ from ..config import settings
 from ..ingestion.embedder import embed_query
 from ..retrieval.vector_store import search
 from ..llm_client import chat_completion
+from ..model_manager import switch_model
 from .state import AgentState
 from .router import route, RouterResult
 from .sandbox import execute as sandbox_execute, validate_code_schema
@@ -124,7 +125,7 @@ def node_plan(state: AgentState) -> AgentState:
     )
     plan = f"Intent: {intent}. Tools: {state.get('required_tools', [])}. Retrieve context then execute."
     try:
-        # Only call LLM if it's running (may not be during tests without llama-server)
+        switch_model("reasoning")
         response = chat_completion(
             messages=[{"role": "user", "content": prompt}],
             max_tokens=80,
@@ -222,6 +223,7 @@ def node_vision(state: AgentState) -> AgentState:
     # When models are present, probe.status = "ok" and we call the model endpoint.
     try:
         from ..llm_client import vision_completion  # type: ignore
+        switch_model("vision")
         result = vision_completion(image_path=image_path, prompt="Describe this P&ID diagram.")
         state = {
             **state,
@@ -295,6 +297,7 @@ def node_codegen(state: AgentState) -> AgentState:
 
     raw_json = None
     try:
+        switch_model("code")
         response = chat_completion(
             messages=[{"role": "user", "content": prompt}],
             max_tokens=400,
@@ -426,7 +429,20 @@ def node_compile_result(state: AgentState) -> AgentState:
             "Do not interpret this as a statutory engineering decision."
         )
     elif intent in ("code",) and reflect_decision == "done" and sandbox_stdout:
-        final = f"Calculation result:\n{sandbox_stdout.strip()}"
+        # LLM Synthesis for code
+        try:
+            switch_model("reasoning")
+            prompt = (
+                "You are an expert engineering assistant. Summarize the following Python calculation "
+                "output into a clear engineering note. \n\n"
+                f"Output: {sandbox_stdout.strip()}"
+            )
+            resp = chat_completion(messages=[{"role": "user", "content": prompt}], max_tokens=300)
+            final = resp.get("content", f"Calculation result:\n{sandbox_stdout.strip()}")
+        except Exception as exc:
+            logger.error(f"LLM compilation failed: {exc}")
+            final = f"Calculation result:\n{sandbox_stdout.strip()}"
+            
     elif intent in ("code",) and reflect_decision == "fail":
         final = (
             "CODE_EXECUTION_FAILED: The calculation could not be completed after "
@@ -436,19 +452,46 @@ def node_compile_result(state: AgentState) -> AgentState:
     elif intent == "vision":
         status = state.get("vision_status", "VISION_UNAVAILABLE")
         if status == "ok":
-            final = state.get("vision_result") or "Vision analysis complete (no text extracted)."
+            vision_text = state.get("vision_result") or ""
+            # LLM Synthesis for vision
+            try:
+                switch_model("reasoning")
+                prompt = (
+                    "You are an expert engineering assistant. The vision model has extracted text "
+                    "from a P&ID diagram. Describe the instrumentation loops found in the text clearly.\n\n"
+                    f"Extracted Text: {vision_text}"
+                )
+                resp = chat_completion(messages=[{"role": "user", "content": prompt}], max_tokens=300)
+                final = resp.get("content", vision_text or "Vision analysis complete.")
+            except Exception as exc:
+                logger.error(f"LLM compilation failed: {exc}")
+                final = vision_text or "Vision analysis complete (no text extracted)."
         else:
             final = (
                 "VISION_UNAVAILABLE: The vision model is not loaded. "
                 "Download Qwen2.5-VL-3B GGUF + mmproj and run scripts/probe_vision.py to enable."
             )
-    elif retrieved:
-        # Build grounded text answer from retrieved chunks
-        context = "\n\n".join(f"[{c.doc_id}] {c.text[:400]}" for c in retrieved[:3])
-        final = (
-            f"Based on retrieved evidence:\n\n{context}\n\n"
-            f"[Source: {', '.join(set(c.doc_id for c in retrieved[:3]))}]"
+    elif retrieved or state.get("query"):
+        # Real LLM Synthesis for RAG or unknown
+        query = state.get("query", "")
+        context_str = "\n\n".join(f"Document [{c.doc_id}]: {c.text}" for c in retrieved[:3])
+        prompt = (
+            "You are the MRPL Sovereign AI Assistant. Answer the user question accurately and "
+            "concisely using the provided refinery documentation context. If the context does not "
+            "contain the answer, politely state that according to MRPL on-prem records, no specific "
+            "clause was found, but provide general guidance based on your knowledge.\n\n"
+            f"Context:\n{context_str}\n\n"
+            f"User Question: {query}"
         )
+        try:
+            switch_model("reasoning")
+            resp = chat_completion(messages=[{"role": "user", "content": prompt}], max_tokens=500)
+            final = resp.get("content", "Error synthesizing response.")
+            if retrieved:
+                final += f"\n\n*Sources: {', '.join(set(c.doc_id for c in retrieved[:3]))}*"
+        except Exception as exc:
+            logger.error(f"LLM compilation failed: {exc}")
+            final = "Error synthesizing response. Model may be unavailable."
     else:
         final = "No result produced. Check event log for details."
 

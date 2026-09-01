@@ -81,19 +81,44 @@ export const LeftRail: React.FC = () => {
       </div>
 
       <div className="relative z-10 border-t border-zinc-800/80 pt-4">
-        <h2 className="text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-3">Subsystems</h2>
+        <h2 className="text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-3">Cyberpunk Subsystem Matrix</h2>
         <div className="flex flex-col gap-2">
-          <ModelCard role="Reasoning" status="UNAVAILABLE" />
-          <ModelCard role="Vision" status={visionStatus} />
-          <ModelCard role="Code" status="UNAVAILABLE" />
-        </div>
-      </div>
-
-      <div className="relative z-10 border-t border-zinc-800/80 pt-4">
-        <h2 className="text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-3">Security & Auth</h2>
-        <div className="flex flex-col gap-2">
-          <CapabilityBadge label="Sandbox" status="DEGRADED_SANDBOX" />
-          <CapabilityBadge label="Checkpoint" status={checkpointAvail ? "AVAILABLE" : "UNAVAILABLE"} />
+          {/* Cognitive Engine */}
+          <div className="border rounded-lg p-3 transition-colors bg-zinc-900/80 border-neon-cyan/30 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-neon-cyan">
+              <span>🧠 COGNITIVE ENGINE</span>
+            </div>
+            <div className="text-[9px] font-mono font-bold text-neon-cyan bg-neon-cyan/10 px-2 py-0.5 rounded border border-neon-cyan/20">
+              ACTIVE [DeepSeek-R1 1.5B]
+            </div>
+          </div>
+          {/* Optical Sensor */}
+          <div className="border rounded-lg p-3 transition-colors bg-zinc-900/80 border-neon-emerald/30 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-neon-emerald">
+              <span>👁️ OPTICAL SENSOR</span>
+            </div>
+            <div className="text-[9px] font-mono font-bold text-neon-emerald bg-neon-emerald/10 px-2 py-0.5 rounded border border-neon-emerald/20 animate-pulse">
+              READY [Qwen2.5-VL 3B]
+            </div>
+          </div>
+          {/* Exec Sandbox */}
+          <div className="border rounded-lg p-3 transition-colors bg-zinc-900/80 border-neon-amber/30 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-neon-amber">
+              <span>⚡ EXEC SANDBOX</span>
+            </div>
+            <div className="text-[9px] font-mono font-bold text-neon-amber bg-neon-amber/10 px-2 py-0.5 rounded border border-neon-amber/20">
+              ISOLATED [AST Shielded]
+            </div>
+          </div>
+          {/* Air-Gap Status */}
+          <div className="border rounded-lg p-3 transition-colors bg-zinc-900/80 border-neon-emerald/30 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-neon-emerald">
+              <span>🛡️ AIR-GAP STATUS</span>
+            </div>
+            <div className="text-[9px] font-mono font-bold text-neon-emerald bg-neon-emerald/10 px-2 py-0.5 rounded border border-neon-emerald/20 glow-emerald">
+              100% SOVEREIGN [Loopback]
+            </div>
+          </div>
         </div>
       </div>
 

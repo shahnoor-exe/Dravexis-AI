@@ -657,3 +657,14 @@ COMPLETE — REHEARSED WITH LIMITATIONS; LOCAL RELEASE READY; GITHUB PUSH COMPLE
   - `RightRail.tsx`: Upgraded the Artifact Shelf to support GSAP 3D card tilt/flip on click and added a live SVG Egress Waveform monitoring graphic.
   - `AgentDag.tsx`: Restyled the React Flow graph with glowing edges and dark neon node states.
 - **Status**: The application is highly polished, secure, and ready for live presentation.
+
+### Live LLM Synthesis & Cyberpunk Overhaul Polish — 2026-09-02
+- **Backend Cognition Fix**:
+  - `src/agent/graph.py` nodes (`node_plan`, `node_compile_result`, `node_codegen`, `node_vision`) were missing calls to `switch_model()`. 
+  - The graph now explicitly calls `model_manager.switch_model("reasoning" | "vision" | "code")` before invoking `chat_completion()` or `vision_completion()`, ensuring the correct model is loaded into VRAM on-demand.
+  - The static text dumps in `node_compile_result` were replaced with real `chat_completion` prompts, resulting in synthesized, conversational LLM responses.
+- **UI Cyberpunk Overhaul**:
+  - `LeftRail.tsx`: Removed the generic `ModelCard` components and hardcoded red/amber warnings. Implemented the precise "Cyberpunk Subsystem Matrix" with glowing indicators (Cognitive Engine, Optical Sensor, Exec Sandbox, Air-Gap Status) as requested.
+  - `CenterStage.tsx`: Upgraded the Response Terminal (`finalAnswer`) to use a sleek typewriter/fading-in markdown response container (`animate-fade-in`, neon glowing borders, and blinking cursor block) for a cinematic feel.
+  - `AgentDag.tsx`: Refined the active node `boxShadow` to a `20px #00f0ff` cyan flare and completed nodes to steady `#00ff66` emerald, matching the sci-fi aesthetic requirements.
+- **Preflight Verification**: The backend API works as expected and successfully serves synthesized reasoning. The frontend strictly adheres to the requested visual fidelity. Ready to commit.

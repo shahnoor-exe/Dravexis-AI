@@ -13,8 +13,8 @@ import type { NodeState } from "../lib/constants";
 // Node state → visual style with Cyberpunk aesthetic
 const NODE_STYLES: Record<NodeState, React.CSSProperties> = {
   idle: { background: "rgba(24, 24, 27, 0.8)", border: "1px solid rgba(82, 82, 91, 0.5)", color: "#a1a1aa", backdropFilter: "blur(4px)" },
-  active: { background: "rgba(0, 240, 255, 0.1)", border: "1px solid rgba(0, 240, 255, 0.8)", color: "#00f0ff", animation: "pulse 1s infinite", boxShadow: "0 0 15px rgba(0, 240, 255, 0.4)", backdropFilter: "blur(4px)", fontWeight: "bold" },
-  success: { background: "rgba(0, 255, 102, 0.1)", border: "1px solid rgba(0, 255, 102, 0.5)", color: "#00ff66", boxShadow: "0 0 10px rgba(0, 255, 102, 0.2)", backdropFilter: "blur(4px)" },
+  active: { background: "rgba(0, 240, 255, 0.1)", border: "1px solid rgba(0, 240, 255, 0.8)", color: "#00f0ff", animation: "pulse 1s infinite", boxShadow: "0 0 20px #00f0ff", backdropFilter: "blur(4px)", fontWeight: "bold" },
+  success: { background: "rgba(0, 255, 102, 0.1)", border: "1px solid rgba(0, 255, 102, 0.8)", color: "#00ff66", boxShadow: "0 0 10px #00ff66", backdropFilter: "blur(4px)" },
   skipped: { background: "rgba(28, 25, 23, 0.8)", border: "1px dashed rgba(87, 83, 78, 0.5)", color: "#78716c", backdropFilter: "blur(4px)" },
   unavailable: { background: "rgba(255, 153, 0, 0.1)", border: "1px solid rgba(255, 153, 0, 0.5)", color: "#ff9900", backdropFilter: "blur(4px)" },
   error: { background: "rgba(255, 0, 85, 0.1)", border: "1px solid rgba(255, 0, 85, 0.8)", color: "#ff0055", boxShadow: "0 0 15px rgba(255, 0, 85, 0.4)", backdropFilter: "blur(4px)" },
