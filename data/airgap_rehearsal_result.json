@@ -1,0 +1,8 @@
+{
+    "evidence_count":  5,
+    "timestamp":  "2026-09-02T02:30:58.3113424+05:30",
+    "intent":  "code",
+    "adapter_status":  "Disabled",
+    "query_latency_ms":  14985,
+    "status":  "ok"
+}

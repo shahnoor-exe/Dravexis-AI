@@ -3,6 +3,12 @@
 
 :root {
   color-scheme: dark;
+  --cyber-bg: #050811;
+  --cyber-obsidian: #0b0f19;
+  --neon-cyan: #00f0ff;
+  --neon-magenta: #ff0055;
+  --neon-emerald: #00ff66;
+  --neon-amber: #ff9900;
 }
 
 * {
@@ -14,24 +20,46 @@
 html, body, #root {
   height: 100%;
   overflow: hidden;
-  background: #09090b;
+  background: var(--cyber-bg);
   color: #f4f4f5;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #18181b; }
+::-webkit-scrollbar-track { background: var(--cyber-obsidian); }
 ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #52525b; }
+::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
 
 /* Textarea */
 textarea { font-family: inherit; }
 
+/* Cyberpunk Scanline Overlay */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 50%, rgba(0, 0, 0, 0.1) 50%, rgba(0, 0, 0, 0.1));
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.3;
+}
+
+/* Glow effects */
+.glow-cyan {
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+  border-color: rgba(0, 240, 255, 0.5);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 15px rgba(0, 255, 102, 0.3);
+  border-color: rgba(0, 255, 102, 0.5);
+}
+
 /* React Flow dark theme override */
-.react-flow__background { background: #18181b !important; }
-.react-flow__controls-button { background: #27272a; border-color: #3f3f46; color: #a1a1aa; }
-.react-flow__controls-button:hover { background: #3f3f46; }
+.react-flow__background { background: var(--cyber-obsidian) !important; }
+.react-flow__controls-button { background: #1a1e2e; border-color: #2a3142; color: var(--neon-cyan); }
+.react-flow__controls-button:hover { background: #2a3142; box-shadow: 0 0 8px rgba(0, 240, 255, 0.2); }
 
 /* Pulse animation for active nodes */
 @keyframes pulse {
@@ -46,3 +74,4 @@ textarea { font-family: inherit; }
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+

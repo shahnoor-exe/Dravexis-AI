@@ -63,17 +63,24 @@ if "!FOUND_GGUF!"=="0" (
 )
 echo [OK] GGUF model(s) found in models\
 
-:: --- 6. Check if FastAPI is already running (duplicate protection) ---
+:: --- 6. Aggressively clean up zombie processes on Port 8000 ---
 echo.
-echo [Check] Is FastAPI backend already running on port 8000?
-powershell -NoProfile -Command "try { $null = Invoke-WebRequest -Uri 'http://127.0.0.1:8000/' -UseBasicParsing -TimeoutSec 2 -EA Stop; Write-Host 'RUNNING' } catch { Write-Host 'DOWN' }" > "%TEMP%\drav_ck.tmp" 2>&1
-set /p BK=<"%TEMP%\drav_ck.tmp"
-del "%TEMP%\drav_ck.tmp" 2>nul
-
-if "!BK!"=="RUNNING" (
-    echo [OK] FastAPI already live at http://127.0.0.1:8000 -- skipping backend launch.
-    goto :LAUNCH_UI
+echo [Check] Checking for zombie processes on Port 8000...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr "0.0.0.0:8000"') do (
+    if not "%%a"=="0" (
+        echo [WARN] Port 8000 is occupied by PID %%a. Killing zombie process...
+        taskkill /F /PID %%a >nul 2>&1
+        timeout /t 1 /nobreak >nul
+    )
 )
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr "127.0.0.1:8000"') do (
+    if not "%%a"=="0" (
+        echo [WARN] Port 8000 is occupied by PID %%a. Killing zombie process...
+        taskkill /F /PID %%a >nul 2>&1
+        timeout /t 1 /nobreak >nul
+    )
+)
+echo [OK] Port 8000 is clean.
 
 :: --- 7. Start FastAPI backend in its own titled window ---
 echo [1/2] Launching FastAPI Backend Gateway...
