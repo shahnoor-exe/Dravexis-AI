@@ -38,7 +38,7 @@ echo [OK] Python: %PYVER%
 :: --- 3. Check Node/npm ---
 where npm >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [WARN] npm not found. UI (Tauri) cannot start. Backend will still launch.
+    echo [WARN] npm not found. UI cannot start. Backend will still launch.
     set "NO_UI=1"
 ) else (
     for /f "tokens=*" %%i in ('npm --version 2^>^&1') do set NPMVER=%%i
@@ -105,7 +105,7 @@ if "!READY!"=="0" (
 )
 
 :LAUNCH_UI
-:: --- 9. Launch UI (Tauri dev) if npm available ---
+:: --- 9. Launch UI (Vite dev server) and Browser if npm available ---
 if "!NO_UI!"=="1" (
     echo [SKIP] UI launch skipped -- npm not found.
     goto :DONE
@@ -117,17 +117,26 @@ if not exist "%ROOT%\ui\mrpl-workbench\package.json" (
 )
 
 echo.
-echo [2/2] Starting Tauri UI (npm run tauri dev)...
-start "Dravexis UI" cmd /k "cd /d ""%ROOT%\ui\mrpl-workbench"" && npm run tauri dev"
+echo [2/2] Starting Vite Web Server (npm run dev)...
+start "Dravexis Web Server" cmd /k "cd /d ""%ROOT%\ui\mrpl-workbench"" && npm run dev"
+
+echo     Waiting for Vite server to start (3s)...
+timeout /t 3 /nobreak >nul
+
+echo     Opening default browser...
+start http://localhost:1420/
 
 :DONE
 echo.
 echo =====================================================================
 echo  Launch sequence complete. Check terminal windows for status.
-echo  FastAPI docs : http://127.0.0.1:8000/docs
-echo  llama-server : http://127.0.0.1:8080/health (when model is loaded)
+echo  FastAPI Backend Docs  : http://127.0.0.1:8000/docs
+echo  Web App (Browser)     : http://localhost:1420/
 echo.
-echo  To stop: close the Backend and UI terminal windows.
+echo  [Optional] To run the native Tauri desktop shell instead of the browser:
+echo  cd ui\mrpl-workbench ^&^& npm run tauri dev
+echo.
+echo  To stop: close the Backend and Web Server terminal windows.
 echo  Logs   : See backend terminal output (non-sensitive).
 echo =====================================================================
 echo.

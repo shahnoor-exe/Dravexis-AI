@@ -596,3 +596,15 @@ All blockers (test isolation, network monitor timeouts, and adapter elevation) a
   - Replaced silent exits with a :FAIL label that runs pause, ensuring errors stay on-screen.
   - Added an explicit pause at the successful :DONE label so the truthful capability summary remains visible to the user.
 - **Typo Fix**: Corrected the irgap_rehearsal.ps1 typo in the brain file.
+
+### Launcher Browser Auto-Start Fix — 2026-09-02T02:48:15+05:30
+
+#### Frontend Dev Server Switch
+- **Root Cause**: The launcher previously called 
+pm run tauri dev which invokes the Rust compiler. This took 5-10 minutes on cold start, providing no web UI feedback and hanging the terminal.
+- **Fix Applied**: 
+  - The launcher now starts the Vite frontend server independently via 
+pm run dev.
+  - Added Windows start http://localhost:1420/ to automatically launch the default system browser for instant frontend access.
+  - Placed the Tauri desktop shell command in the console banner as an optional manual action.
+- **Impact**: Provides instant access to the prototype via the browser while allowing the backend to run uninterrupted.
