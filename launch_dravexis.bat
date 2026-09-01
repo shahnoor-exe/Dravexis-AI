@@ -1,12 +1,13 @@
 @echo off
 :: launch_dravexis.bat — Dravexis On-Prem Agentic Control Layer launcher
-:: Resolves project root relative to this file. Works from double-click and CMD/PS.
-:: Hardened against path spaces and silent exits.
+:: Hardened against path spaces (SIH 2026 PS 117), silent exits, and llama-server deadlock.
+::
+:: Architecture note: llama-server is managed on-demand by model_manager.py.
+:: This launcher starts ONLY FastAPI + Vite. llama-server spawns per query.
 
 setlocal EnableDelayedExpansion
 
-:: --- 1. Path Safety ---
-:: Securely resolve project root and ensure it is quoted when used
+:: --- 1. Resolve project root safely (quotes handle spaces in path) ---
 set "ROOT=%~dp0"
 if "%ROOT:~-1%"=="\" set "ROOT=%ROOT:~0,-1%"
 cd /d "%ROOT%"
@@ -17,135 +18,134 @@ echo  Dravexis -- On-Prem Agentic Control Layer
 echo  Project root: "%ROOT%"
 echo =====================================================================
 echo.
-echo  CAPABILITY SUMMARY (truthful as of 2026-09-02):
+echo  CAPABILITY SUMMARY:
 echo    GPU     : CPU_FALLBACK_OR_NO_GPU_OFFLOAD
 echo    Sandbox : DEGRADED_SANDBOX (AST allowlist, no Docker)
-echo    Monitor : MONITOR_UNAVAILABLE (process-level psutil, no NPCAP)
-echo    Vision  : VISION_AVAILABLE (CPU-based, ~9-14s cold-start)
-echo    Timing  : Reasoning ~2.7s  Coder ~2.7s  Full query ~10s
+echo    Monitor : MONITOR_UNAVAILABLE (psutil socket-level, no NPCAP)
+echo    Vision  : VISION_AVAILABLE  (~9-14s cold-start, CPU)
+echo    LLM     : On-demand hot-swap  (Reasoning ~2.7s / Coder ~2.7s)
 echo =====================================================================
 echo.
 
-:: --- 2. Check Python ---
+:: --- 2. Preflight: Python ---
 where python >nul 2>&1
 if %errorlevel% neq 0 (
     echo [ERROR] Python not found on PATH. Install Python 3.11+ and retry.
     goto :FAIL
 )
 for /f "tokens=*" %%i in ('python --version 2^>^&1') do set PYVER=%%i
-echo [OK] Python: %PYVER%
+echo [OK] %PYVER%
 
-:: --- 3. Check Node/npm ---
+:: --- 3. Preflight: Node/npm ---
 where npm >nul 2>&1
 if %errorlevel% neq 0 (
-    echo [WARN] npm not found. UI cannot start. Backend will still launch.
+    echo [WARN] npm not found. Web UI will not be started.
     set "NO_UI=1"
 ) else (
     for /f "tokens=*" %%i in ('npm --version 2^>^&1') do set NPMVER=%%i
-    echo [OK] npm: %NPMVER%
+    echo [OK] npm %NPMVER%
     set "NO_UI=0"
 )
 
-:: --- 4. Check llama-server binary ---
+:: --- 4. Preflight: llama-server binary ---
 if not exist "%ROOT%\bin\llama-server.exe" (
-    echo [ERROR] bin\llama-server.exe missing. Run scripts\download_llama_server.ps1 first.
+    echo [ERROR] bin\llama-server.exe missing. Run: .\scripts\download_llama_server.ps1
     goto :FAIL
 )
-echo [OK] llama-server.exe present
+echo [OK] llama-server.exe present (used on-demand by model_manager)
 
-:: --- 5. Check at least one GGUF model ---
+:: --- 5. Preflight: At least one GGUF model ---
 set "FOUND_GGUF=0"
 for %%f in ("%ROOT%\models\*.gguf") do set "FOUND_GGUF=1"
 if "!FOUND_GGUF!"=="0" (
-    echo [ERROR] No *.gguf models found in models\. Run download scripts first.
+    echo [ERROR] No *.gguf models in models\. Run download scripts first.
     goto :FAIL
 )
 echo [OK] GGUF model(s) found in models\
 
 :: --- 6. Check if FastAPI is already running (duplicate protection) ---
 echo.
-echo [Check] Testing whether backend is already running...
-powershell -NoProfile -Command ^
-    "try { $r = Invoke-WebRequest -Uri 'http://127.0.0.1:8000/' -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop; Write-Host 'ALREADY_RUNNING' } catch { Write-Host 'NOT_RUNNING' }" > "%TEMP%\dravexis_check.tmp" 2>&1
-set /p BKSTATUS=<"%TEMP%\dravexis_check.tmp"
-del "%TEMP%\dravexis_check.tmp" 2>nul
+echo [Check] Is FastAPI backend already running on port 8000?
+powershell -NoProfile -Command "try { $null = Invoke-WebRequest -Uri 'http://127.0.0.1:8000/' -UseBasicParsing -TimeoutSec 2 -EA Stop; Write-Host 'RUNNING' } catch { Write-Host 'DOWN' }" > "%TEMP%\drav_ck.tmp" 2>&1
+set /p BK=<"%TEMP%\drav_ck.tmp"
+del "%TEMP%\drav_ck.tmp" 2>nul
 
-if "!BKSTATUS!"=="ALREADY_RUNNING" (
-    echo [OK] FastAPI backend already running at http://127.0.0.1:8000 -- skipping duplicate launch.
+if "!BK!"=="RUNNING" (
+    echo [OK] FastAPI already live at http://127.0.0.1:8000 -- skipping backend launch.
     goto :LAUNCH_UI
 )
 
-:: --- 7. Start backend in a new titled terminal ---
-echo [1/2] Starting backend (llama-server + FastAPI)...
-start "Dravexis Backend" cmd /k "cd /d ""%ROOT%"" && powershell -NoProfile -ExecutionPolicy Bypass -File "".\scripts\start_all.ps1"""
+:: --- 7. Start FastAPI backend in its own titled window ---
+echo [1/2] Launching FastAPI Backend Gateway...
+echo       (llama-server will spawn automatically on first agent query)
+start "Dravexis Backend Gateway" cmd /k "cd /d ""%ROOT%"" && set PYTHONUTF8=1 && python -m uvicorn src.main:app --host 127.0.0.1 --port 8000"
 
-:: --- 8. Poll FastAPI health (bounded: max 60s) ---
-echo     Waiting for FastAPI to become ready (max 60s)...
+:: --- 8. Poll FastAPI health (max 15s — should be ready in ~2-3s) ---
+echo       Waiting for FastAPI to be ready (max 15s)...
 set "READY=0"
-for /L %%i in (1,1,30) do (
+for /L %%i in (1,1,15) do (
     if "!READY!"=="0" (
-        powershell -NoProfile -Command ^
-            "try { $r = Invoke-WebRequest -Uri 'http://127.0.0.1:8000/' -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop; Write-Host 'OK' } catch { Write-Host 'WAIT' }" > "%TEMP%\dravexis_health.tmp" 2>&1
-        set /p HSTATUS=<"%TEMP%\dravexis_health.tmp"
-        del "%TEMP%\dravexis_health.tmp" 2>nul
-        if "!HSTATUS!"=="OK" set "READY=1"
+        powershell -NoProfile -Command "try { $null = Invoke-WebRequest -Uri 'http://127.0.0.1:8000/' -UseBasicParsing -TimeoutSec 1 -EA Stop; Write-Host 'OK' } catch { Write-Host 'WAIT' }" > "%TEMP%\drav_h.tmp" 2>&1
+        set /p HS=<"%TEMP%\drav_h.tmp"
+        del "%TEMP%\drav_h.tmp" 2>nul
+        if "!HS!"=="OK" set "READY=1"
         if "!READY!"=="0" (
-            timeout /t 2 /nobreak >nul
-            echo      .
+            timeout /t 1 /nobreak >nul
         )
     )
 )
 
 if "!READY!"=="0" (
-    echo [ERROR] FastAPI did not respond within 60s. Check the Backend terminal for errors.
-    echo        Common causes: port 8000 in use, missing requirements, llama-server crash.
+    echo [ERROR] FastAPI did not respond within 15s.
+    echo         Check the "Dravexis Backend Gateway" terminal window for errors.
     goto :FAIL
-) else (
-    echo [OK] FastAPI ready at http://127.0.0.1:8000
 )
+echo [OK] FastAPI ready at http://127.0.0.1:8000
 
 :LAUNCH_UI
-:: --- 9. Launch UI (Vite dev server) and Browser if npm available ---
 if "!NO_UI!"=="1" (
     echo [SKIP] UI launch skipped -- npm not found.
     goto :DONE
 )
-
 if not exist "%ROOT%\ui\mrpl-workbench\package.json" (
-    echo [WARN] ui\mrpl-workbench\package.json not found. Skipping UI launch.
+    echo [WARN] ui\mrpl-workbench\package.json not found. Skipping UI.
     goto :DONE
 )
 
+:: --- 9. Start Vite dev server in its own window ---
 echo.
-echo [2/2] Starting Vite Web Server (npm run dev)...
+echo [2/2] Launching Vite Web Server (npm run dev, port 1420)...
 start "Dravexis Web Server" cmd /k "cd /d ""%ROOT%\ui\mrpl-workbench"" && npm run dev"
 
-echo     Waiting for Vite server to start (3s)...
+echo       Waiting 3s for Vite to bind...
 timeout /t 3 /nobreak >nul
 
-echo     Opening default browser...
+:: --- 10. Auto-open default browser ---
+echo       Opening default browser...
 start http://localhost:1420/
 
 :DONE
 echo.
 echo =====================================================================
-echo  Launch sequence complete. Check terminal windows for status.
-echo  FastAPI Backend Docs  : http://127.0.0.1:8000/docs
-echo  Web App (Browser)     : http://localhost:1420/
+echo  Dravexis is running!
 echo.
-echo  [Optional] To run the native Tauri desktop shell instead of the browser:
-echo  cd ui\mrpl-workbench ^&^& npm run tauri dev
+echo   FastAPI Backend  : http://127.0.0.1:8000
+echo   API Docs         : http://127.0.0.1:8000/docs
+echo   Web App (Browser): http://localhost:1420/
 echo.
-echo  To stop: close the Backend and Web Server terminal windows.
-echo  Logs   : See backend terminal output (non-sensitive).
+echo  [Note] First query will trigger on-demand model load (~2-3s).
+echo  [Info] For native Tauri desktop shell (needs Rust/cargo):
+echo         cd ui\mrpl-workbench ^&^& npm run tauri dev
+echo.
+echo  To stop: close the Backend Gateway and Web Server terminal windows.
 echo =====================================================================
 echo.
-:: Explicit pause so the window doesn't immediately close on success
 pause
 exit /b 0
 
 :FAIL
 echo.
-echo [!] Launch aborted due to errors. Review the messages above.
+echo [!!!] Launch failed. Read errors above.
+echo       Press any key to close this window.
 pause
 exit /b 1

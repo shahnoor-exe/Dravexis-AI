@@ -608,3 +608,40 @@ pm run dev.
   - Added Windows start http://localhost:1420/ to automatically launch the default system browser for instant frontend access.
   - Placed the Tauri desktop shell command in the console banner as an optional manual action.
 - **Impact**: Provides instant access to the prototype via the browser while allowing the backend to run uninterrupted.
+
+### Launcher Deadlock Root-Cause Fix — 2026-09-02T02:54:31+05:30
+
+#### Root Cause
+scripts\start_all.ps1 synchronously polled llama-server /health for up to 120s before ever
+starting FastAPI (python -m uvicorn). Because llama-server takes 2-15s to load the GGUF
+model before serving /health, FastAPI was never started during that window.
+launch_dravexis.bat then called start_all.ps1 and polled http://127.0.0.1:8000/ — which
+returned nothing because FastAPI never launched. This caused the 60-dot timeout deadlock.
+
+This was a fundamental conflict with the Phase 2 architecture decision: llama-server is
+managed ON-DEMAND by src/model_manager.py. Starting a persistent llama-server at launch
+is wrong by design and causes VRAM waste and process-restart conflicts.
+
+#### Fix Applied
+
+scripts\start_all.ps1:
+- REMOVED: synchronous llama-server Start-Process + /health polling loop (lines 46-75).
+- CHANGED: FastAPI is now started IMMEDIATELY in the foreground via:
+    python -m uvicorn src.main:app --host 127.0.0.1 --port 8000
+- ADDED: Architecture note in script header explaining that llama-server is managed
+  on-demand by model_manager.py, not at startup.
+
+launch_dravexis.bat:
+- CHANGED: Now spawns FastAPI directly (cmd /k python -m uvicorn ...) instead of
+  calling start_all.ps1, which has different terminal semantics.
+- REDUCED: Health poll timeout from 60s to 15s. FastAPI alone starts in ~5s without
+  waiting for model load.
+- NO CHANGE to Vite launch or browser auto-open logic (working correctly).
+
+#### Verification
+- FastAPI started in 5242ms with no llama-server involvement.
+- Status: running | Phase: 3
+- First agent query will trigger on-demand model_manager load (~2-3s additional).
+
+#### Phase 4 Final Status
+COMPLETE — REHEARSED WITH LIMITATIONS; LOCAL RELEASE READY; GITHUB PUSH COMPLETED.
