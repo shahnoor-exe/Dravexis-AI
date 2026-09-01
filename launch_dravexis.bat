@@ -85,7 +85,7 @@ echo [OK] Port 8000 is clean.
 :: --- 7. Start FastAPI backend in its own titled window ---
 echo [1/2] Launching FastAPI Backend Gateway...
 echo       (llama-server will spawn automatically on first agent query)
-start "Dravexis Backend Gateway" cmd /k "cd /d ""%ROOT%"" && set PYTHONUTF8=1 && python -m uvicorn src.main:app --host 127.0.0.1 --port 8000"
+start "Dravexis Backend Gateway" cmd /k "cd /d ""%ROOT%"" && set ""PYTHONUTF8=1"" && python -m uvicorn src.main:app --host 127.0.0.1 --port 8000"
 
 :: --- 8. Poll FastAPI health (max 15s — should be ready in ~2-3s) ---
 echo       Waiting for FastAPI to be ready (max 15s)...
