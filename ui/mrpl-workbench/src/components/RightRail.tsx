@@ -230,8 +230,8 @@ export const RightRail: React.FC = () => {
   const { visionStatus, sandboxMode, error } = useAgentStore();
 
   return (
-    <aside className="flex flex-col gap-6 w-72 min-w-[18rem] p-5 bg-cyber-obsidian border-l border-zinc-800/80 overflow-y-auto relative shadow-[-4px_0_24px_rgba(0,0,0,0.3)]">
-      <div className="absolute inset-0 scanlines opacity-20 mix-blend-overlay"></div>
+    <aside className="right-rail flex flex-col gap-5 w-72 min-w-[18rem] p-4 bg-cyber-obsidian border-l border-zinc-800/80 overflow-y-auto relative shadow-[-4px_0_24px_rgba(0,0,0,0.3)]">
+      <div className="absolute inset-0 scanlines opacity-15 mix-blend-overlay"></div>
       
       {/* Capability warnings */}
       {(visionStatus === "VISION_UNAVAILABLE" || sandboxMode === "DEGRADED_SANDBOX" || error) && (

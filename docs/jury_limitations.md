@@ -11,7 +11,7 @@
 
 | Capability | Status | Detail |
 |---|---|---|
-| Sovereign on-premise deployment | ✅ Full | 100% air-gapped; zero cloud dependency |
+| Sovereign on-premise deployment | ✅ Full | Air-gappable design; zero cloud dependency in tested configuration |
 | Document RAG with statutory grounding | ✅ Working | FastEmbed BGE + Qdrant Embedded; 17 vectors |
 | Intent routing (regex + keyword) | ✅ Working | 5 intent classes; deterministic fast-path |
 | LangGraph FSM with audit trace | ✅ Working | 7 nodes; SqliteSaver checkpoint |
@@ -26,7 +26,7 @@
 
 | Limitation | Label | Why |
 |---|---|---|
-| Vision model requires ~3 GB VRAM | VISION_UNAVAILABLE | Dev hardware: RTX 3050 Laptop, 4 GB. Sequential load only. |
+| Vision model requires ~3 GB VRAM | VISION_AVAILABLE | Qwen2.5-VL-3B confirmed working; CPU fallback; ~9.5s cold-start |
 | Code sandbox is NOT Docker isolation | DEGRADED_SANDBOX | Docker not installed on this hardware. AST allowlist only. |
 | Packet-level network capture unavailable | MONITOR_UNAVAILABLE | NPCAP requires admin install. psutil is process-level only. |
 | Corpus is 17 vectors (5 documents) | DEMO CORPUS | Production ingest would cover full OISD/ASME document set. |
@@ -40,7 +40,7 @@
 ## Architecture Claim Boundaries
 
 ### Air-Gap Claim
-**Proven:** No new sockets to external IPs during inference. All model inference is local (llama-server, FastEmbed, Qdrant). Artifact generation is local (python-docx, openpyxl, python-pptx).  
+**Proven:** Offline execution demonstrated with WAN adapter disabled in elevated rehearsal (2026-09-02T02:30+05:30). No new sockets to external IPs during inference. All model inference is local (llama-server, FastEmbed, Qdrant). Artifact generation is local (python-docx, openpyxl, python-pptx).  
 **Not proven (without NPCAP):** Packet-level zero-egress. psutil monitors sockets and byte counts; it does not capture individual packets.
 
 ### RAG Grounding Claim

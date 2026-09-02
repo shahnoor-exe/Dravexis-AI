@@ -777,3 +777,11 @@ COMPLETE — REHEARSED WITH LIMITATIONS; LOCAL RELEASE READY; GITHUB PUSH COMPLE
 - Combined evidence supports air-gappable design claim
 - All limitations remain honestly represented in UI, README, and evidence files
 - Next action: commit and push final evidence and fixes
+
+### Phase 5 — Final Hardening & UI Polish started — 2026-09-02T12:44:00+05:30
+- Files read: PROJECT_BRAIN.md, README.md, docs/demo_scripts.md, docs/jury_limitations.md, conftest.py, src/config.py, src/retrieval/vector_store.py, tests/test_retrieve_regression.py, ui components (LeftRail, CenterStage, AgentDag, RightRail, TopBar), index.css
+- Commit inspected: 2859924
+- Phase 4 status: COMPLETE WITH DOCUMENTED LIMITATIONS
+- Known limitations: GPU=CPU_FALLBACK, Sandbox=DEGRADED, Monitor=UNAVAILABLE, 6 Qdrant lock test failures
+- Task scope: test isolation fix, artifact route fix, claim enforcement, demo calibration, rehearsal script, UI polish
+- Validation: all tests must pass with FastAPI running, no forbidden claims, structured evidence output

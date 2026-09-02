@@ -1,0 +1,207 @@
+{
+  "timestamp": "2026-09-02T12:58:44.870465+05:30",
+  "rehearsal_type": "final_demo",
+  "model_verification": [
+    {
+      "name": "DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf",
+      "exists": true,
+      "size_bytes": 1117320800,
+      "size_gb": 1.041
+    },
+    {
+      "name": "Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf",
+      "exists": true,
+      "size_bytes": 1929901056,
+      "size_gb": 1.797
+    },
+    {
+      "name": "mmproj-Qwen2.5-VL-3B-Instruct-Q8_0.gguf",
+      "exists": true,
+      "size_bytes": 844757728,
+      "size_gb": 0.787
+    },
+    {
+      "name": "Qwen2.5-Coder-1.5B-Instruct-Q4_K_M.gguf",
+      "exists": true,
+      "size_bytes": 986048800,
+      "size_gb": 0.918
+    }
+  ],
+  "service_health": {
+    "status": "ok",
+    "code": 200,
+    "body": {
+      "service": "MRPL Agentic AI Workbench",
+      "phase": 3,
+      "status": "running",
+      "endpoints": [
+        "/chat",
+        "/ingest",
+        "/network-status",
+        "/agent/run",
+        "/agent/router-info",
+        "/agent/graph-info",
+        "/artifacts/generate",
+        "/artifacts/generate-all",
+        "/artifacts/download/{file_name}",
+        "/artifacts/list",
+        "/network/monitor",
+        "/network/monitor/summary",
+        "/docs"
+      ]
+    }
+  },
+  "network_status": {
+    "status": "ok",
+    "interfaces": [
+      {
+        "name": "Ethernet",
+        "addresses": [
+          "169.254.178.81",
+          "fe80::5cf7:dfd7:8cb:f4b4"
+        ],
+        "is_loopback": false
+      },
+      {
+        "name": "Local Area Connection* 1",
+        "addresses": [
+          "169.254.192.18",
+          "fe80::4d91:309c:270:5320"
+        ],
+        "is_loopback": true
+      },
+      {
+        "name": "Local Area Connection* 2",
+        "addresses": [
+          "169.254.182.87",
+          "fe80::f5c1:be99:9df9:4632"
+        ],
+        "is_loopback": true
+      },
+      {
+        "name": "Wi-Fi",
+        "addresses": [
+          "172.25.186.52",
+          "fe80::f7a6:abe:cdb6:95f9"
+        ],
+        "is_loopback": false
+      },
+      {
+        "name": "vEthernet (Default Switch)",
+        "addresses": [
+          "172.25.224.1",
+          "fe80::6e00:d371:47c7:2fe9"
+        ],
+        "is_loopback": false
+      },
+      {
+        "name": "Loopback Pseudo-Interface 1",
+        "addresses": [
+          "127.0.0.1",
+          "::1"
+        ],
+        "is_loopback": true
+      }
+    ],
+    "llama_server_reachable": true,
+    "qdrant_healthy": true,
+    "timestamp": "2026-09-02T07:28:45.543721+00:00"
+  },
+  "network_monitor": {
+    "status": "psutil_only",
+    "monitor_capability": "psutil_only",
+    "reason": null,
+    "bytes_sent_delta": 13549169,
+    "bytes_recv_delta": 1455812,
+    "egress_note": "MEASURED \u2014 13549169B sent",
+    "service_health": {
+      "llama_server": "ok",
+      "fastapi": "ok",
+      "qdrant": "unreachable: ConnectTimeout"
+    },
+    "packet_capture": "MONITOR_UNAVAILABLE",
+    "timestamp_utc": 1788334157.8013532
+  },
+  "scenarios": [
+    {
+      "name": "Warm RAG - OISD 116 H2S Inspection",
+      "status": "pass",
+      "intent": "rag",
+      "confidence": 0.78,
+      "latency_ms": 5249.6,
+      "evidence_count": 5,
+      "max_retrieval_score": 0.8472,
+      "vision_status": "not_requested",
+      "sandbox_mode": "not_run",
+      "final_answer_length": 660,
+      "model_switch_latency_ms": null,
+      "active_model": null,
+      "error": null,
+      "events_count": 6
+    },
+    {
+      "name": "Warm RAG - Flare System N2 Purge",
+      "status": "pass",
+      "intent": "rag",
+      "confidence": 0.78,
+      "latency_ms": 3763.8,
+      "evidence_count": 5,
+      "max_retrieval_score": 0.7734,
+      "vision_status": "not_requested",
+      "sandbox_mode": "not_run",
+      "final_answer_length": 358,
+      "model_switch_latency_ms": null,
+      "active_model": null,
+      "error": null,
+      "events_count": 6
+    },
+    {
+      "name": "Code Intent - Corrosion Life Calculation",
+      "status": "pass",
+      "intent": "code",
+      "confidence": 0.8,
+      "latency_ms": 20713.2,
+      "evidence_count": 5,
+      "max_retrieval_score": 0.7233,
+      "vision_status": "not_requested",
+      "sandbox_mode": "DEGRADED_SANDBOX",
+      "final_answer_length": 156,
+      "model_switch_latency_ms": null,
+      "active_model": "code",
+      "error": null,
+      "events_count": 12
+    }
+  ],
+  "artifact_test": {
+    "name": "Artifact Generation (DOCX)",
+    "status": "pass",
+    "status_code": 200,
+    "latency_ms": 450.4,
+    "response_keys": [
+      "status",
+      "type",
+      "file_name",
+      "file_path",
+      "provenance",
+      "error"
+    ],
+    "error": null
+  },
+  "capability_labels": {
+    "reasoning": "AVAILABLE",
+    "vision": "VISION_AVAILABLE",
+    "coder": "AVAILABLE",
+    "sandbox": "DEGRADED_SANDBOX",
+    "network_monitor": "MONITOR_UNAVAILABLE",
+    "gpu": "CPU_FALLBACK_OR_NO_GPU_OFFLOAD"
+  },
+  "prior_offline_evidence": {
+    "source": "data/airgap_rehearsal_result.json",
+    "timestamp": "2026-09-02T02:30:58+05:30",
+    "adapter_status": "Disabled",
+    "query_status": "ok",
+    "latency_ms": 14985,
+    "evidence_count": 5,
+    "note": "Prior elevated session successfully disabled Wi-Fi and executed offline query."
+  }
+}

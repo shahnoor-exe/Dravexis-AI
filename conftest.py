@@ -45,6 +45,15 @@ def isolate_qdrant_storage(tmp_path_factory):
     except Exception:
         pass
 
+    # Patch the already-instantiated settings singleton directly.
+    # The env var alone is insufficient because settings = Settings() in config.py
+    # was already constructed at module-import time with the production path.
+    try:
+        from src.config import settings as _settings
+        _settings.qdrant_path = str(tmp_dir)
+    except Exception:
+        pass
+
     # Seed the isolated store from production so Qdrant tests can find real vectors
     prod_path = Path(__file__).parent / "data" / "qdrant_storage"
     if prod_path.exists():

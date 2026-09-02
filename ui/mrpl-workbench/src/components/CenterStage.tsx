@@ -51,7 +51,8 @@ export const CenterStage: React.FC = () => {
 
   return (
     <main className="flex flex-col flex-1 min-w-0 bg-cyber-bg overflow-hidden relative">
-      <div className="absolute inset-0 scanlines opacity-30 mix-blend-overlay pointer-events-none"></div>
+      <div className="absolute inset-0 scanlines opacity-20 mix-blend-overlay pointer-events-none"></div>
+      <div className="absolute inset-0 grid-overlay pointer-events-none"></div>
       
       {/* Query Composer */}
       <div className="p-5 border-b border-zinc-800/80 relative z-10 bg-zinc-950/80 backdrop-blur-sm">
@@ -102,26 +103,28 @@ export const CenterStage: React.FC = () => {
           <div className="absolute left-4 bottom-4 text-[10px] text-zinc-500 font-mono">CTRL+ENTER to execute</div>
         </div>
 
-        {/* Capability warnings always visible */}
-        <div className="flex flex-wrap gap-3 mt-4 items-center">
-          {visionStatus === "VISION_UNAVAILABLE" && (
-            <CapabilityBadge label="Vision" status="VISION_UNAVAILABLE" compact />
-          )}
-          {(sandboxMode === "DEGRADED_SANDBOX" || sandboxMode === "not_run") && (
-            <CapabilityBadge label="Sandbox" status="DEGRADED_SANDBOX" compact />
-          )}
-          {latencyMs !== null && (
-            <span className="text-[10px] text-neon-amber font-mono bg-neon-amber/10 border border-neon-amber/30 px-2 py-0.5 rounded">
-              T+{latencyMs.toFixed(0)}ms
-            </span>
-          )}
-          {intent && (
-            <span className="text-[10px] text-zinc-400 font-mono bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
-              INTENT: <span className="text-neon-cyan">{intent}</span>
-              {confidence !== null && <span className="text-zinc-500"> ({(confidence * 100).toFixed(0)}%)</span>}
-            </span>
-          )}
-        </div>
+        {/* Telemetry Readout Strip */}
+        {(latencyMs !== null || intent) && (
+          <div className="flex flex-wrap gap-3 mt-3 items-center animate-fade-in">
+            {visionStatus === "VISION_UNAVAILABLE" && (
+              <CapabilityBadge label="Vision" status="VISION_UNAVAILABLE" compact />
+            )}
+            {(sandboxMode === "DEGRADED_SANDBOX" || sandboxMode === "not_run") && (
+              <CapabilityBadge label="Sandbox" status="DEGRADED_SANDBOX" compact />
+            )}
+            {latencyMs !== null && (
+              <span className="latency-badge">
+                ⏱ {(latencyMs / 1000).toFixed(1)}s
+              </span>
+            )}
+            {intent && (
+              <span className="text-[9px] text-zinc-400 font-mono bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+                INTENT: <span className="text-neon-cyan">{intent}</span>
+                {confidence !== null && <span className="text-zinc-500"> ({(confidence * 100).toFixed(0)}%)</span>}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Tabs */}

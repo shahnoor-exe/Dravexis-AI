@@ -1,7 +1,7 @@
 # Demo Scripts — MRPL Agentic AI Workbench (Phase 4)
 ## SIH 2026 / PS 26117 — Final 3 Scenarios
 
-> **LATENCY NOTES:** All `[T+Xs]` markers are placeholders. Fill in real values from `data/preflight_results.json` after running `.\scripts\run_preflight.ps1`.
+> **LATENCY NOTES:** All timings below are observed rehearsal measurements from the development machine (RTX 3050 Laptop, 4 GB VRAM, CPU_FALLBACK_OR_NO_GPU_OFFLOAD). They are NOT guaranteed SLAs. Actual latency depends on hardware, model loading state, and query complexity.
 > Vision timings are conditional on preflight vision status.
 
 ---
@@ -44,7 +44,7 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8080/models" -Method POST `
 | 1 | Open query composer | Click text area | — | "We have a fresh inspection reading from CDU-V-101 — an H2S wet-service pressure vessel." |
 | 2 | Type query | `What is the OISD 116 remaining life for a pressure vessel with 8.2 mm measured wall, 6.0 mm minimum, and 0.30 mm/yr corrosion rate?` | — | "I'm asking the agent to pull the right statutory clause and compute remaining life." |
 | 3 | Submit | Ctrl+Enter | — | "Agent starts: Plan → Retrieve → CodeGen → Sandbox." |
-| 4 | DAG animates | Watch left rail | `[T+Xs] reasoning` | "You can see the graph trace in real time — each node lights up as it completes." |
+| 4 | DAG animates | Watch left rail | ~6–20s (warm ~6s, cold ~20s) | "You can see the graph trace in real time — each node lights up as it completes." |
 | 5 | Evidence tab | Click "Evidence" | — | "OISD 116 and our ASME B31.3 corpus are the grounding sources — score 0.79, 0.71." |
 | 6 | Answer tab | Click "Answer" | — | "Remaining life: 7.33 years. Next inspection window: 3.67 years — within the OISD Class A 5-year mandate." |
 | 7 | Generate DOCX | Right rail → "Approval Note" → Generate | `[T+2s]` | "Now the agent compiles a formal approval note with provenance, signatures section, and a statutory disclaimer." |
@@ -68,7 +68,7 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8080/models" -Method POST `
 |---|---|---|---|
 | 1 | Upload P&ID image | Drag to composer | — | "P&ID for the CDU overhead reflux loop — let's ask the agent to flag any instrumentation gaps." |
 | 2 | Type query | `Analyse this P&ID and list any missing safety instrumentation per OISD 118` | — | — |
-| 3 | Submit | `[T+Xs vision]` | "Vision node activates — VL-3B model tiles the image and runs inference." |
+| 3 | Submit | ~9.5s vision cold-start + ~5s inference | "Vision node activates — VL-3B model tiles the image and runs inference." |
 | 4 | Answer | — | "Agent identified 2 PSV locations, flagged missing low-flow alarm on reflux line." |
 | 5 | Generate XLSX | Right rail → Analysis Sheet → Generate | `[T+2s]` | "Calculation sheet with live formulas — flagged items, OISD reference, remediation column." |
 | 6 | Download | — | "Team gets an actionable checklist grounded in statutory clauses." |
@@ -104,7 +104,7 @@ Invoke-RestMethod -Uri "http://127.0.0.1:8080/models" -Method POST `
 | 3 | Confirm OS shows disconnected | taskbar icon | — | "OS confirms no network." |
 | 4 | Confirm UI still works | Backend badge still CONNECTED (loopback) | — | "Backend stays green — it's on 127.0.0.1. The system is fully self-contained." |
 | 5 | Submit query | `Calculate remaining corrosion life for a vessel at 0.45 mm/yr with 8.0 mm measured wall` | — | "Full agent run: Plan → Retrieve → CodeGen → Sandbox." |
-| 6 | Observe DAG | Watch trace complete | `[T+Xs]` | "All computation is local — Qdrant, FastEmbed, llama-server. Nothing left the machine." |
+| 6 | Observe DAG | Watch trace complete | ~6–24s depending on intent | "All computation is local — Qdrant, FastEmbed, llama-server. Nothing left the machine." |
 | 7 | Network monitor | Right rail refresh | — | "Socket count: only loopback connections. External socket count: zero. [If NPCAP: packet capture confirms zero external packets / If psutil-only: process-level sockets show no external connections — packet-level evidence requires NPCAP.]" |
 | 8 | Generate DOCX while disconnected | — | "Even artifact generation is local — python-docx runs in-process. No cloud call." |
 | 9 | Reconnect WAN | `Enable-NetAdapter` / reconnect | — | "Reconnecting — backend continues without restart. Clean resumption." |
@@ -130,7 +130,7 @@ Stop the demo. Do not narrate around it. Fix before demo day.
 | Full Demo 3 | est. ~2–3 min (air-gap + query ~10s + DOCX) | 5 min target |
 | **Total run-through** | est. **12–15 min** (CPU-based; all models sequential) | **15–18 min target** |
 
-> **CPU note:** All cold-start timings measured CPU_FALLBACK_OR_NO_GPU_OFFLOAD on RTX 3050 Laptop (4 GB VRAM). GPU offload not confirmed; timings reflect CPU inference. Hot-switch latency: reasoning→coder measured 2026-09-02 (see data/model_swap_latency.json).
+> **CPU note:** All timings are observed rehearsal measurements under CPU_FALLBACK_OR_NO_GPU_OFFLOAD on RTX 3050 Laptop (4 GB VRAM). GPU offload was not confirmed (VRAM delta 0 MiB). These are NOT guaranteed latency SLAs.
 
 ---
 

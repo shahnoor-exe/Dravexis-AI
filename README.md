@@ -2,13 +2,13 @@
 
 <div align="center">
 
-![Sovereign](https://img.shields.io/badge/Sovereign-100%25_Air--Gapped-success?style=for-the-badge)
+![Sovereign](https://img.shields.io/badge/Sovereign-Air--Gappable_Design-success?style=for-the-badge)
 ![VRAM](https://img.shields.io/badge/VRAM_Target-4GB_RTX_3050-blue?style=for-the-badge)
 ![LLM](https://img.shields.io/badge/LLM-DeepSeek_R1_%26_Qwen2.5-orange?style=for-the-badge)
 ![Tauri](https://img.shields.io/badge/UI-Tauri_v2_%2B_React-cyan?style=for-the-badge)
 
 **SIH 2026 | PS 26117 / PS 117 | Sovereign AI Workbench**<br>
-A 100% on-premise, air-gappable agentic RAG stack for refinery knowledge retrieval and decision support.
+A sovereign on-premise, air-gappable agentic RAG stack for refinery knowledge retrieval and decision support.
 
 </div>
 
@@ -87,7 +87,7 @@ graph TD
 |---|---|---|
 | **LLM Server** | `llama-server` (llama.cpp) | `127.0.0.1:8080` |
 | **API Gateway** | FastAPI + Uvicorn | `127.0.0.1:8000` |
-| **Embeddings** | FastEmbed BGE-M3 (dim=1024) | in-process |
+| **Embeddings** | FastEmbed BGE-large-en-v1.5 (dim=1024) | in-process |
 | **Vector Store** | Qdrant Embedded (on-disk) | in-process |
 | **Frontend** | React 19 + Tauri v2 (Rust) + GSAP | `localhost:1420` |
 
