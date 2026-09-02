@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-02T11:34:23Z",
+  "timestamp": "2026-09-02T14:26:41Z",
   "cases_run": 6,
   "results": [
     {
@@ -16,87 +16,103 @@
       "result": {
         "status": 200,
         "data": {
-          "session_id": "5a6d5db2-f400-45b7-b628-28dab971a5e7",
-          "status": "ok",
+          "run_id": "5a5eeaa5-2e2f-4cc8-bdcd-103540304863",
+          "session_id": "5a5eeaa5-2e2f-4cc8-bdcd-103540304863",
+          "status": "completed",
+          "success": true,
           "intent": "vision",
-          "confidence": 0.0,
-          "method": "",
+          "model_role": "reasoning",
+          "model_status": "loaded",
+          "answer": "ERROR: No image attached. Please upload an image or provide a path to a local image in data/.",
+          "error": null,
+          "warnings": [],
           "events": [
             {
-              "event_id": "plan_enter_12",
-              "seq": 12,
-              "ts": 1788348827.7798939,
+              "event_id": "plan_enter_104",
+              "seq": 104,
+              "ts": 1788359165.9960475,
               "node": "plan",
               "event": "enter",
               "phase": "enter",
-              "query": "Analyze this P&ID diagram."
+              "query": "Analyze this P&ID diagram.",
+              "run_id": "5a5eeaa5-2e2f-4cc8-bdcd-103540304863"
             },
             {
-              "event_id": "plan_exit_13",
-              "seq": 13,
-              "ts": 1788348834.8535018,
+              "event_id": "plan_exit_105",
+              "seq": 105,
+              "ts": 1788359171.3662407,
               "node": "plan",
               "event": "exit",
               "phase": "exit",
-              "plan_summary": "Okay, so I need to analyze this P&ID diagram. The user provided a P&ID diagram, but I don't have the"
+              "plan_summary": "Okay, so I need to analyze a P&ID diagram. P&ID stands for Parent-Child-Direction, right? It's a way",
+              "run_id": "5a5eeaa5-2e2f-4cc8-bdcd-103540304863"
             },
             {
-              "event_id": "retrieve_enter_14",
-              "seq": 14,
-              "ts": 1788348834.8549864,
+              "event_id": "retrieve_enter_106",
+              "seq": 106,
+              "ts": 1788359171.3674996,
               "node": "retrieve",
               "event": "enter",
-              "phase": "enter"
+              "phase": "enter",
+              "run_id": "5a5eeaa5-2e2f-4cc8-bdcd-103540304863"
             },
             {
-              "event_id": "retrieve_exit_15",
-              "seq": 15,
-              "ts": 1788348834.954621,
+              "event_id": "retrieve_exit_107",
+              "seq": 107,
+              "ts": 1788359171.4292808,
               "node": "retrieve",
               "event": "exit",
               "phase": "exit",
               "chunks": 5,
               "max_score": 0.579,
-              "insufficient": false
+              "insufficient": false,
+              "run_id": "5a5eeaa5-2e2f-4cc8-bdcd-103540304863"
             },
             {
-              "event_id": "vision_enter_16",
-              "seq": 16,
-              "ts": 1788348834.962226,
+              "event_id": "vision_enter_108",
+              "seq": 108,
+              "ts": 1788359171.4304578,
               "node": "vision",
               "event": "enter",
-              "phase": "enter"
+              "phase": "enter",
+              "run_id": "5a5eeaa5-2e2f-4cc8-bdcd-103540304863"
             },
             {
-              "event_id": "vision_exit_17",
-              "seq": 17,
-              "ts": 1788348834.9622488,
+              "event_id": "vision_exit_109",
+              "seq": 109,
+              "ts": 1788359171.4304645,
               "node": "vision",
               "event": "exit",
               "phase": "exit",
               "status": "VISION_NO_IMAGE",
-              "reason": "no image attached"
+              "reason": "no image attached",
+              "run_id": "5a5eeaa5-2e2f-4cc8-bdcd-103540304863"
             },
             {
-              "event_id": "compile_result_enter_18",
-              "seq": 18,
-              "ts": 1788348834.9662626,
+              "event_id": "compile_result_enter_110",
+              "seq": 110,
+              "ts": 1788359171.432373,
               "node": "compile_result",
               "event": "enter",
-              "phase": "enter"
+              "phase": "enter",
+              "run_id": "5a5eeaa5-2e2f-4cc8-bdcd-103540304863"
             },
             {
-              "event_id": "compile_result_exit_19",
-              "seq": 19,
-              "ts": 1788348834.966276,
+              "event_id": "compile_result_exit_111",
+              "seq": 111,
+              "ts": 1788359171.4323804,
               "node": "compile_result",
               "event": "exit",
               "phase": "exit",
               "intent": "vision",
               "answer_len": 93,
-              "source_type": "error"
+              "source_type": "error",
+              "run_id": "5a5eeaa5-2e2f-4cc8-bdcd-103540304863"
             }
           ],
+          "latency_ms": 5458.4,
+          "confidence": 0.0,
+          "method": "",
           "retrieved_evidence": [
             {
               "doc_id": "oisd_116_annex_inspection_checklist",
@@ -133,184 +149,19 @@
           "code_status": "not_requested",
           "sandbox_mode": "not_run",
           "iteration": 0,
-          "final_answer": "ERROR: No image attached. Please upload an image or provide a path to a local image in data/.",
-          "error": "No image attached. Please upload an image or provide a path to a local image in data/.",
           "active_model": "reasoning",
           "model_switch_latency_ms": null,
-          "total_latency_ms": 7209.2
+          "total_latency_ms": 5458.4
         },
-        "latency_ms": 7218.7042236328125
+        "latency_ms": 5464.0748500823975
       }
     },
     {
       "case": "4_CODE_GEN",
       "expected_intent": "code",
       "result": {
-        "status": 200,
-        "data": {
-          "session_id": "21b7b3b9-bffb-46e7-97f9-7dc9eab7e867",
-          "status": "partial",
-          "intent": "code",
-          "confidence": 0.95,
-          "method": "regex",
-          "events": [
-            {
-              "event_id": "plan_enter_20",
-              "seq": 20,
-              "ts": 1788348834.9924884,
-              "node": "plan",
-              "event": "enter",
-              "phase": "enter",
-              "query": "Write a python script to parse logs."
-            },
-            {
-              "event_id": "plan_exit_22",
-              "seq": 22,
-              "ts": 1788348840.2012339,
-              "node": "plan",
-              "event": "exit",
-              "phase": "exit",
-              "plan_summary": "Okay, so I need to write a Python script to parse logs. The user wants a one-sentence plan. I should"
-            },
-            {
-              "event_id": "retrieve_enter_23",
-              "seq": 23,
-              "ts": 1788348840.2022848,
-              "node": "retrieve",
-              "event": "enter",
-              "phase": "enter"
-            },
-            {
-              "event_id": "retrieve_exit_24",
-              "seq": 24,
-              "ts": 1788348840.2529285,
-              "node": "retrieve",
-              "event": "exit",
-              "phase": "exit",
-              "chunks": 5,
-              "max_score": 0.4456,
-              "insufficient": true
-            },
-            {
-              "event_id": "codegen_enter_25",
-              "seq": 25,
-              "ts": 1788348840.2540119,
-              "node": "codegen",
-              "event": "enter",
-              "phase": "enter",
-              "iteration": 0
-            },
-            {
-              "event_id": "codegen_exit_26",
-              "seq": 26,
-              "ts": 1788348850.1143682,
-              "node": "codegen",
-              "event": "exit",
-              "phase": "exit",
-              "schema_valid": true,
-              "error": null
-            },
-            {
-              "event_id": "sandbox_exec_enter_27",
-              "seq": 27,
-              "ts": 1788348850.115448,
-              "node": "sandbox_exec",
-              "event": "enter",
-              "phase": "enter"
-            },
-            {
-              "event_id": "sandbox_exec_exit_28",
-              "seq": 28,
-              "ts": 1788348850.11797,
-              "node": "sandbox_exec",
-              "event": "exit",
-              "phase": "exit",
-              "exit_code": 0,
-              "mode": "DEGRADED_SANDBOX",
-              "elapsed_ms": 0.1
-            },
-            {
-              "event_id": "reflect_enter_29",
-              "seq": 29,
-              "ts": 1788348850.1190445,
-              "node": "reflect",
-              "event": "enter",
-              "phase": "enter",
-              "iteration": 0
-            },
-            {
-              "event_id": "reflect_exit_30",
-              "seq": 30,
-              "ts": 1788348850.1190596,
-              "node": "reflect",
-              "event": "exit",
-              "phase": "exit",
-              "decision": "done",
-              "iteration": 0
-            },
-            {
-              "event_id": "compile_result_enter_31",
-              "seq": 31,
-              "ts": 1788348850.1206443,
-              "node": "compile_result",
-              "event": "enter",
-              "phase": "enter"
-            },
-            {
-              "event_id": "compile_result_exit_32",
-              "seq": 32,
-              "ts": 1788348863.231846,
-              "node": "compile_result",
-              "event": "exit",
-              "phase": "exit",
-              "intent": "code",
-              "answer_len": 1090,
-              "source_type": "local_model"
-            }
-          ],
-          "retrieved_evidence": [
-            {
-              "doc_id": "mrpl_sop_flare_system",
-              "chunk_index": 0,
-              "score": 0.4456,
-              "text_preview": "MRPL Standard Operating Procedure \u2014 Flare System Operations\nDocument No: MRPL-OPS-SOP-007 (Illustrative Synthetic Demo Excerpt)\n\n1. PURPOSE\n\nThis Standard Operating Procedure (SOP) defines the operati"
-            },
-            {
-              "doc_id": "mrpl_sop_flare_system",
-              "chunk_index": 1,
-              "score": 0.4432,
-              "text_preview": "urce of excess relief\n    - Header back-pressure high-high: > 2.5 bar g \u2192 automatic diversion to secondary flare (if commissioned)\n\n4. START-UP PROCEDURE \u2014 FLARE IGNITION\n\n4.1 Pre-ignition Checks\n    "
-            },
-            {
-              "doc_id": "oisd_116_annex_inspection_checklist",
-              "chunk_index": 0,
-              "score": 0.4405,
-              "text_preview": "OISD 116 \u2014 Annexure: Inspection Checklist for Static Equipment\nSynthetic reference checklist for MRPL demonstration.\n\nPRESSURE VESSEL PRE-INSPECTION CHECKLIST (OISD-116 Annex C)\n\nEquipment Tag: ______"
-            },
-            {
-              "doc_id": "oisd_118_appendix_fire_detectors",
-              "chunk_index": 0,
-              "score": 0.4353,
-              "text_preview": "OISD 118 \u2014 Appendix on Fire and Gas Detection Systems (MRPL Demo Supplement)\nSynthetic reference document for demonstration purposes only.\n\nSECTION A \u2014 FIXED GAS DETECTOR PLACEMENT (OISD-118 Annex B)\n"
-            },
-            {
-              "doc_id": "mrpl_corrosion_inspection_procedure",
-              "chunk_index": 0,
-              "score": 0.4272,
-              "text_preview": "MRPL Corrosion Inspection Procedure \u2014 COR-INSP-001 Rev 3\nSynthetic internal procedure document for demonstration purposes only.\n\n1. SCOPE\nThis procedure covers corrosion inspection methodology for sta"
-            }
-          ],
-          "vision_status": "not_requested",
-          "code_status": "ok",
-          "sandbox_mode": "DEGRADED_SANDBOX",
-          "iteration": 1,
-          "final_answer": "You have provided the following information: The user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 25 years old, and the calculation output is \"Remaining life: 8.3 years.\"\n\nThe user is 2",
-          "error": null,
-          "active_model": "code",
-          "model_switch_latency_ms": null,
-          "total_latency_ms": 28276.7
-        },
-        "latency_ms": 28279.54626083374
+        "status": 500,
+        "error": ""
       }
     },
     {
@@ -319,24 +170,33 @@
       "result": {
         "status": 200,
         "data": {
-          "session_id": "3a38aeb0-2beb-463f-8c0e-abdfe2acf987",
+          "run_id": "b310170a-8e22-4f0b-a975-77710f2412b4",
+          "session_id": "b310170a-8e22-4f0b-a975-77710f2412b4",
           "status": "partial",
+          "success": false,
           "intent": "unknown",
+          "model_role": null,
+          "model_status": null,
+          "answer": "Please ask a question or provide input.",
+          "error": {
+            "code": "EMPTY_INPUT",
+            "message": "Input was empty."
+          },
+          "warnings": [],
+          "events": [],
+          "latency_ms": 0.5,
           "confidence": 0.0,
           "method": "",
-          "events": [],
           "retrieved_evidence": [],
           "vision_status": "not_requested",
           "code_status": "not_requested",
           "sandbox_mode": "not_run",
           "iteration": 0,
-          "final_answer": "Please ask a question or provide input.",
-          "error": "Input was empty.",
           "active_model": null,
           "model_switch_latency_ms": null,
-          "total_latency_ms": 0.1
+          "total_latency_ms": 0.5
         },
-        "latency_ms": 3.694772720336914
+        "latency_ms": 13.736963272094727
       }
     },
     {
@@ -347,7 +207,7 @@
         "data": {
           "detail": "Not Found"
         },
-        "latency_ms": 1.7592906951904297
+        "latency_ms": 15.916824340820312
       }
     },
     {
@@ -358,33 +218,72 @@
         "data": {
           "reasoning": {
             "status": "available",
+            "display_name": "Cognitive Engine",
             "model": "DeepSeek-R1-1.5B",
+            "last_checked": "2026-09-02T14:26:41Z",
+            "error_code": null,
+            "error_message": null,
+            "action": null,
+            "evidence": "System prompt passed",
             "loaded": true
           },
           "vision": {
             "status": "available",
+            "display_name": "Optical Sensor",
             "model": "Qwen2.5-VL-3B",
+            "last_checked": "2026-09-02T14:26:41Z",
+            "error_code": null,
+            "error_message": null,
+            "action": null,
+            "evidence": "probe=True, gguf=True, mmproj=True",
             "probe_ok": true,
             "loaded": false
           },
           "coder": {
             "status": "available",
+            "display_name": "Code Generator",
             "model": "Qwen2.5-Coder-1.5B",
+            "last_checked": "2026-09-02T14:26:41Z",
+            "error_code": null,
+            "error_message": null,
+            "action": null,
+            "evidence": "Using reasoning fallback",
             "loaded": true
           },
           "gpu": {
-            "status": "CUDA_ACCELERATED"
+            "status": "degraded",
+            "display_name": "Hardware Accel",
+            "model": "CUDA/CPU",
+            "last_checked": "2026-09-02T14:26:41Z",
+            "error_code": "CPU_FALLBACK",
+            "error_message": "GPU Offload partial",
+            "action": "Check CUDA Toolkit",
+            "evidence": "CPU_FALLBACK_OR_NO_GPU_OFFLOAD"
           },
           "sandbox": {
-            "status": "DEGRADED_SANDBOX",
+            "status": "degraded",
+            "display_name": "Execution Sandbox",
+            "model": "Restricted Python",
+            "last_checked": "2026-09-02T14:26:41Z",
+            "error_code": "DEGRADED_SANDBOX",
+            "error_message": "Limited to core math packages",
+            "action": "Admin setup required for Docker",
+            "evidence": "mode=restricted_python",
             "mode": "restricted_python"
           },
           "network": {
-            "status": "MONITOR_UNAVAILABLE",
+            "status": "degraded",
+            "display_name": "Network Monitor",
+            "model": "psutil Host",
+            "last_checked": "2026-09-02T14:26:41Z",
+            "error_code": "MONITOR_UNAVAILABLE",
+            "error_message": "No PCAP driver available",
+            "action": "Install npcap/libpcap",
+            "evidence": "mode=psutil_only",
             "mode": "psutil_only"
           }
         },
-        "latency_ms": 5.047798156738281
+        "latency_ms": 5.483388900756836
       }
     }
   ]

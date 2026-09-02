@@ -186,8 +186,7 @@ export const LeftRail: React.FC<{ width?: number }> = ({ width }) => {
 
   return (
     <aside 
-      style={{ width: width ? `${width}px` : undefined }}
-      className="left-rail flex flex-col gap-4 w-72 min-w-[18rem] max-w-[50vw] p-4 bg-cyber-obsidian border-r border-zinc-800/80 overflow-y-auto relative z-0 shadow-[4px_0_24px_rgba(0,0,0,0.3)] shrink-0 transition-[width] duration-75"
+      className="left-rail flex flex-col gap-4 w-72 min-w-[18rem] max-w-[50vw] p-4 bg-cyber-obsidian border-r border-zinc-800/80 overflow-visible relative z-[60] shadow-[4px_0_24px_rgba(0,0,0,0.3)] shrink-0 transition-[width] duration-75"
     >
       <div className="absolute inset-0 scanlines opacity-15 mix-blend-overlay pointer-events-none"></div>
 

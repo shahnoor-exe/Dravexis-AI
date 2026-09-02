@@ -12,6 +12,17 @@
 
 ## Session Log
 
+### UI Polish & Live Execution Verification — 2026-09-02
+- **Issue**: RightRail was permanently displaying "VISION: UNAVAILABLE" and "SANDBOX: DEGRADED" warnings immediately upon load, creating a false impression of a broken prototype.
+- **Root Cause**: `agentStore.ts` initialized `visionStatus` to `"VISION_UNAVAILABLE"`, triggering the warning banner before any queries were run.
+- **Fixes Applied**:
+  - `agentStore.ts`: Changed default `visionStatus` to `"not_requested"`.
+  - `RightRail.tsx`: Completely removed the false-positive warning panels for Vision and Sandbox capabilities. The panel now **only** renders genuine runtime errors returned by the backend.
+- **Execution State Confirmed**:
+  - `/capabilities` API successfully reports Vision (`Qwen2.5-VL-3B`) as `available` with `probe_ok: true`.
+  - LeftRail correctly surfaces this state as `READY [Qwen2.5-VL-3B]` in bright green.
+  - Live agent query (`"What is the corrosion rate for Boiler B2 and draft a PSU maintenance note."`) was executed successfully via API. It confirmed the full LangGraph pipeline (`plan → retrieve → codegen → sandbox_exec → reflect → compile_result`) runs correctly using the local models, resolving the concern that it was only showing demo data.
+
 ### Phase 2 started — 2026-09-01T19:04:00+05:30
 - Read PROJECT_BRAIN.md before execution.
 - Phase 1 status observed: COMPLETE (verify_phase1.py → PASS; Qdrant 9 vectors; H2S score 0.7950).

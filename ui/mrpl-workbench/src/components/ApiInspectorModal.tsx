@@ -20,7 +20,7 @@ export const ApiInspectorModal: React.FC<Props> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-cyber-obsidian border border-zinc-800/80 rounded-sm w-full max-w-4xl max-h-[85vh] flex flex-col shadow-[0_0_50px_rgba(32,227,255,0.1)]">
         
         <div className="flex items-center justify-between p-4 border-b border-zinc-800/80 bg-slate-glass/50">

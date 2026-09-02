@@ -48,7 +48,7 @@ export const HistoryWorkspace: React.FC<Props> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute inset-y-0 right-0 w-80 bg-cyber-obsidian border-l border-zinc-800/80 shadow-[0_0_40px_rgba(0,0,0,0.8)] z-50 flex flex-col transform transition-transform duration-300">
+    <div className="absolute inset-y-0 right-0 w-80 bg-cyber-obsidian border-l border-zinc-800/80 shadow-[0_0_40px_rgba(0,0,0,0.8)] z-[100] flex flex-col transform transition-transform duration-300">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-zinc-800/80 bg-slate-glass/30 backdrop-blur-md">
         <h2 className="text-zinc-300 text-[10px] font-mono uppercase tracking-[0.2em] flex items-center gap-2">

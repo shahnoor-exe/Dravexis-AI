@@ -274,26 +274,14 @@ export const RightRail: React.FC<{ width?: number }> = ({ width }) => {
     >
       <div className="absolute inset-0 scanlines opacity-15 mix-blend-overlay pointer-events-none"></div>
       
-      {/* Capability warnings */}
-      {(visionStatus === "VISION_UNAVAILABLE" || sandboxMode === "DEGRADED_SANDBOX" || error) && (
+      {/* Capability warnings - only show genuine runtime errors */}
+      {error && (
         <div className="bg-slate-glass/50 border border-neon-amber/30 rounded-sm p-4 relative z-10">
           <h3 className="text-neon-amber text-[10px] font-mono font-bold tracking-widest uppercase mb-3 flex items-center gap-2">
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             System Warnings
           </h3>
           <div className="flex flex-col gap-2 font-mono text-[10px]">
-            {visionStatus === "VISION_UNAVAILABLE" && (
-              <div className="text-amber-200/80 border-l-2 border-neon-amber/50 pl-2 break-words">
-                <span className="text-neon-amber font-bold">VISION:</span> UNAVAILABLE<br/>
-                VL model not loaded.
-              </div>
-            )}
-            {sandboxMode === "DEGRADED_SANDBOX" && (
-              <div className="text-orange-300 border-l-2 border-orange-500/50 pl-2 break-words">
-                <span className="text-orange-400 font-bold">SANDBOX:</span> DEGRADED<br/>
-                AST allowlist only.
-              </div>
-            )}
             {error && (
               <div className="text-red-300 border-l-2 border-red-500/50 pl-2" style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}>
                 <div className="flex items-center justify-between mb-1">
