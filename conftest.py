@@ -48,7 +48,10 @@ def isolate_qdrant_storage(tmp_path_factory):
     # Seed the isolated store from production so Qdrant tests can find real vectors
     prod_path = Path(__file__).parent / "data" / "qdrant_storage"
     if prod_path.exists():
-        shutil.copytree(str(prod_path), str(tmp_dir), dirs_exist_ok=True)
+        shutil.copytree(
+            str(prod_path), str(tmp_dir), dirs_exist_ok=True,
+            ignore=shutil.ignore_patterns(".lock"),
+        )
 
     yield tmp_dir
 
