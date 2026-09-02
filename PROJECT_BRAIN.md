@@ -12,6 +12,14 @@
 
 ## Session Log
 
+### Demonstration Blueprint Implementation — 2026-09-02
+- **Feature Added**: Integrated a comprehensive `DemoMode` component mapped exactly to the 14-feature SIH Demonstration Blueprint.
+- **Implementation**: 
+  - Created `DemoMode.tsx` with all queries, architecture paths, and seed document references grouped logically into a 4-phase "5-Minute Evaluator Flow".
+  - Configured full-screen React Portal rendering to bypass `TopBar` stacking context constraints.
+  - Added a `DEMO` button to the `TopBar.tsx` next to `DEV_INSPECT` to launch the mode.
+- **Verification**: Verified UI behavior via local Vite Dev server. The modal correctly takes over the viewport with full styling, and queries can be loaded or executed instantly.
+
 ### UI Polish & Live Execution Verification — 2026-09-02
 - **Issue**: RightRail was permanently displaying "VISION: UNAVAILABLE" and "SANDBOX: DEGRADED" warnings immediately upon load, creating a false impression of a broken prototype.
 - **Root Cause**: `agentStore.ts` initialized `visionStatus` to `"VISION_UNAVAILABLE"`, triggering the warning banner before any queries were run.

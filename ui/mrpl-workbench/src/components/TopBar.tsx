@@ -6,6 +6,7 @@ import { REFINERY_CONTEXTS, OPERATOR_ROLES } from "../lib/constants";
 import { Button } from "./ui/Button";
 import { HistoryWorkspace } from "./HistoryWorkspace";
 import { ApiInspectorModal } from "./ApiInspectorModal";
+import { DemoMode } from "./DemoMode";
 
 interface TopBarProps {
   onToggleHistory?: () => void;
@@ -14,6 +15,7 @@ interface TopBarProps {
 export const TopBar: React.FC<TopBarProps> = ({ onToggleHistory }) => {
   const [historyOpen, setHistoryOpen] = useState(false);
   const [apiInspectorOpen, setApiInspectorOpen] = useState(false);
+  const [demoModeOpen, setDemoModeOpen] = useState(false);
   const {
     refineryContext, setRefineryContext,
     operatorRole, setOperatorRole,
@@ -90,6 +92,17 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleHistory }) => {
           <Button
             variant="ghost"
             size="sm"
+            onClick={() => setDemoModeOpen(true)}
+            className="text-zinc-500 hover:text-neon-emerald hidden md:flex"
+            tooltip="Open Demo Blueprint"
+          >
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+            DEMO
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setApiInspectorOpen(true)}
             className="text-zinc-500 hover:text-neon-cyan hidden md:flex"
             tooltip="Inspect API Payloads"
@@ -115,6 +128,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleHistory }) => {
 
     <HistoryWorkspace isOpen={historyOpen} onClose={() => setHistoryOpen(false)} />
     <ApiInspectorModal isOpen={apiInspectorOpen} onClose={() => setApiInspectorOpen(false)} />
+    {demoModeOpen && <DemoMode onClose={() => setDemoModeOpen(false)} />}
     </>
   );
 };

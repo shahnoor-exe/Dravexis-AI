@@ -228,3 +228,23 @@
 {"event": "model_started", "role": "code", "model": "Qwen2.5-Coder-1.5B-Instruct-Q4_K_M.gguf", "pid": 19584, "start_timestamp": 1788364387.58106, "ready_timestamp": 1788364390.222923, "cold_start_ms": 2641.9, "success": true}
 {"event": "model_stopped", "role": "code", "pid": 19584, "timestamp": 1788364414.3195665}
 {"event": "model_started", "role": "reasoning", "model": "DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf", "pid": 9060, "start_timestamp": 1788364414.324042, "ready_timestamp": 1788364414.652102, "cold_start_ms": 328.1, "success": true}
+{"event": "model_stopped", "role": "reasoning", "pid": 9060, "timestamp": 1788364744.4567745}
+{"event": "model_started", "role": "vision", "model": "Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf", "pid": 20888, "start_timestamp": 1788364744.471183, "ready_timestamp": 1788364746.1192772, "cold_start_ms": 1648.1, "success": true}
+{"event": "model_stopped", "role": "vision", "pid": 20888, "timestamp": 1788364775.313546}
+{"event": "model_started", "role": "reasoning", "model": "DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf", "pid": 19024, "start_timestamp": 1788364775.319691, "ready_timestamp": 1788364776.0455694, "cold_start_ms": 725.9, "success": true}
+{"event": "model_stopped", "role": "reasoning", "pid": 19024, "timestamp": 1788366023.6147175}
+{"event": "model_stopped", "role": "code", "pid": 13368, "timestamp": 1788366027.3782098}
+{"event": "model_started", "role": "code", "model": "Qwen2.5-Coder-1.5B-Instruct-Q4_K_M.gguf", "pid": 13368, "start_timestamp": 1788366023.6874828, "ready_timestamp": 1788366028.1198452, "cold_start_ms": 4432.4, "success": true}
+{"event": "model_started", "role": "reasoning", "model": "DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf", "pid": 15644, "start_timestamp": 1788366027.3807087, "ready_timestamp": 1788366031.4066968, "cold_start_ms": 4026.0, "success": true}
+{"event": "model_stopped", "role": "reasoning", "pid": 15644, "timestamp": 1788367204.6319726}
+{"event": "model_started", "role": "code", "model": "Qwen2.5-Coder-1.5B-Instruct-Q4_K_M.gguf", "pid": 5644, "start_timestamp": 1788367204.6897764, "ready_timestamp": 1788367208.1229527, "cold_start_ms": 3433.7, "success": true}
+{"event": "model_stopped", "role": "code", "pid": 5644, "timestamp": 1788367239.6652532}
+{"event": "model_started", "role": "reasoning", "model": "DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf", "pid": 21632, "start_timestamp": 1788367239.672822, "ready_timestamp": 1788367240.7352061, "cold_start_ms": 1062.6, "success": true}
+{"event": "model_stopped", "role": "reasoning", "pid": 21632, "timestamp": 1788367268.609393}
+{"event": "model_started", "role": "code", "model": "Qwen2.5-Coder-1.5B-Instruct-Q4_K_M.gguf", "pid": 18880, "start_timestamp": 1788367268.6319895, "ready_timestamp": 1788367272.8760638, "cold_start_ms": 4244.7, "success": true}
+{"event": "model_stopped", "role": "code", "pid": 18880, "timestamp": 1788367284.3573847}
+{"event": "model_started", "role": "reasoning", "model": "DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf", "pid": 23720, "start_timestamp": 1788367284.3697329, "ready_timestamp": 1788367288.905777, "cold_start_ms": 4536.8, "success": true}
+{"event": "model_stopped", "role": "reasoning", "pid": 23720, "timestamp": 1788367413.2852461}
+{"event": "model_started", "role": "vision", "model": "Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf", "pid": 17784, "start_timestamp": 1788367413.3013706, "ready_timestamp": 1788367416.6915407, "cold_start_ms": 3390.7, "success": true}
+{"event": "model_stopped", "role": "vision", "pid": 17784, "timestamp": 1788367429.58419}
+{"event": "model_started", "role": "reasoning", "model": "DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf", "pid": 15020, "start_timestamp": 1788367429.5967252, "ready_timestamp": 1788367432.5339034, "cold_start_ms": 2937.6, "success": true}
