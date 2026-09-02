@@ -172,7 +172,7 @@ class TestPptxCompiler:
             for shape in slide.shapes:
                 if shape.has_text_frame:
                     all_text += shape.text_frame.text + " "
-        assert "not an engineering approval" in all_text, "Disclaimer not found in PPTX"
+        assert "Dravexis AI demonstration system" in all_text, "Disclaimer not found in PPTX"
 
     def test_pptx_has_limitations_slide(self):
         """Limitations slide must ALWAYS be present — never suppressed."""

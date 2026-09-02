@@ -28,9 +28,9 @@ from ..config import BASE_DIR
 
 logger = logging.getLogger(__name__)
 
-DISCLAIMER = (
-    "Prototype output — not an engineering approval or statutory determination. "
-    "MRPL Sovereign AI Workbench — Demo System."
+_DISCLAIMER_TEXT = (
+    "This presentation was generated automatically by the "
+    "Dravexis AI demonstration system."
 )
 ARTIFACT_DIR = BASE_DIR / "data" / "artifacts"
 COMPILER_VERSION = "pptx_compiler-0.1.0 / python-pptx-1.0.2"
@@ -54,7 +54,7 @@ def _add_disclaimer_footer(slide, prs) -> None:
     p = tf.paragraphs[0]
     p.alignment = PP_ALIGN.CENTER
     run = p.add_run()
-    run.text = DISCLAIMER
+    run.text = _DISCLAIMER_TEXT
     run.font.size = Pt(7)
     run.font.color.rgb = _WARN_RED
     run.font.italic = True
@@ -126,7 +126,7 @@ def generate(
         bg.fill.fore_color.rgb = _MRPL_BLUE
         bg.line.fill.background()
 
-        _title_box(s1, prs, "MRPL Sovereign AI Workbench", y=Inches(0.4), size=Pt(32), color=_WHITE)
+        _title_box(s1, prs, "Dravexis AI", y=Inches(0.4), size=Pt(32), color=_WHITE)
         _title_box(s1, prs, "Equipment Inspection — Executive Briefing (DEMO)", y=Inches(1.2), size=Pt(20), color=_WHITE)
         _body_box(s1, prs,
             f"Query: {query[:120]}\n"
@@ -217,7 +217,7 @@ def generate(
             f"Compiler:       {COMPILER_VERSION}\n"
             f"Evidence Count: {len(evidence)}\n"
             f"Evidence IDs:   {', '.join(ev.get('doc_id','?') for ev in evidence[:5]) or 'none'}\n\n"
-            f"Disclaimer: {DISCLAIMER}"
+            f"Disclaimer: {_DISCLAIMER_TEXT}"
         )
         _body_box(s5, prs, prov_text, size=Pt(11))
         _add_disclaimer_footer(s5, prs)

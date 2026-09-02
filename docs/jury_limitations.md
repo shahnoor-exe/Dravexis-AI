@@ -1,9 +1,9 @@
-// Jury Limitations Summary — MRPL Agentic AI Workbench (PS 26117)
+// Jury Limitations Summary — Dravexis AI (PS 26117)
 // SIH 2026 | For disclosure during jury Q&A
 // Must mirror PROJECT_BRAIN.md Known Risks — do NOT contradict it.
 
 # Capability & Limitations Summary
-## MRPL Sovereign Agentic AI Workbench — SIH 2026
+## Dravexis AI — SIH 2026
 
 ---
 
@@ -46,6 +46,10 @@
 ### RAG Grounding Claim
 **Proven:** Top retrieved chunk scores (0.72–0.87) for OISD/ASME clauses. Synthetic MRPL values (N₂ purge rate 200 Nm³/h, KOD 70%) retrievable and injected into prompts.  
 **Not proven:** LLM answer faithfulness without a human review step. Retrieval grounds the context; the LLM may still hallucinate details.
+
+## UI and Frontend Limitations
+- **Local History**: History is implemented using a client-side Zustand store (`localStorage`). It holds the last 100 sessions. It does not synchronize across browsers or devices, keeping the data strictly on the user's local machine.
+- **GSAP Animations**: The `prefers-reduced-motion` media query gracefully degrades SVG cognitive core animations to simple color transitions, strictly prioritizing accessibility over aesthetics.  
 
 ### Vision Claim
 **Proven (if AVAILABLE):** Qwen2.5-VL-3B can perform instrumentation symbol recognition on 800×600 tiles.  

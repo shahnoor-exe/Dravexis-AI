@@ -10,7 +10,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 cd $PSScriptRoot\..
 
 Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host " DRAVEXIS - AIR-GAP REHEARSAL (ELEVATED)" -ForegroundColor Cyan
+Write-Host " Dravexis AI - Air-Gap Rehearsal (ELEVATED)" -ForegroundColor Cyan
 Write-Host "=======================================================" -ForegroundColor Cyan
 
 Write-Host "`n1. Discovering Network Adapters..." -ForegroundColor Yellow

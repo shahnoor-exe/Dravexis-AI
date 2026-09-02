@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Dravexis backend startup — starts ONLY FastAPI gateway.
+    Dravexis AI backend startup — starts ONLY FastAPI gateway.
     llama-server is managed on-demand by src/model_manager.py (hot-swap
     architecture). Starting a persistent llama-server here would:
       (a) block this script synchronously while the model loads (~3-15s),
@@ -22,7 +22,7 @@ $ProjectRoot = Split-Path $PSScriptRoot -Parent
 
 Write-Host "" 
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host " Dravexis -- On-Prem Agentic Control Layer" -ForegroundColor Cyan
+Write-Host " Dravexis AI" -ForegroundColor Cyan
 Write-Host " Backend Gateway Startup" -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 Write-Host ""

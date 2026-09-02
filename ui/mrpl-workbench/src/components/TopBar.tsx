@@ -1,10 +1,19 @@
 // components/TopBar.tsx — Project header: session ID, refinery context, operator role, status
-import React from "react";
+import React, { useState } from "react";
 import { useSettingsStore } from "../store/settingsStore";
 import { CapabilityBadge } from "./CapabilityBadge";
 import { REFINERY_CONTEXTS, OPERATOR_ROLES } from "../lib/constants";
+import { Button } from "./ui/Button";
+import { HistoryWorkspace } from "./HistoryWorkspace";
+import { ApiInspectorModal } from "./ApiInspectorModal";
 
-export const TopBar: React.FC = () => {
+interface TopBarProps {
+  onToggleHistory?: () => void;
+}
+
+export const TopBar: React.FC<TopBarProps> = ({ onToggleHistory }) => {
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [apiInspectorOpen, setApiInspectorOpen] = useState(false);
   const {
     refineryContext, setRefineryContext,
     operatorRole, setOperatorRole,
@@ -12,6 +21,7 @@ export const TopBar: React.FC = () => {
   } = useSettingsStore();
 
   return (
+    <>
     <header className="flex items-center justify-between px-6 py-4 bg-cyber-obsidian border-b border-zinc-800/80 shadow-[0_4px_30px_rgba(0,0,0,0.5)] select-none relative overflow-hidden z-10">
       {/* Scanline overlay for header */}
       <div className="absolute inset-0 scanlines opacity-40 mix-blend-overlay"></div>
@@ -25,7 +35,7 @@ export const TopBar: React.FC = () => {
         </div>
         <div>
           <div className="text-zinc-100 font-bold text-base tracking-wide uppercase flex items-center gap-2">
-            MRPL Sovereign <span className="text-neon-cyan font-light">Workbench</span>
+            Dravexis <span className="text-neon-cyan font-light">AI</span>
           </div>
           <div className="text-neon-amber text-[10px] font-mono tracking-widest mt-0.5 opacity-80">
             PS 26117 · AIR-GAPPED CONTROL LAYER
@@ -68,12 +78,43 @@ export const TopBar: React.FC = () => {
 
       {/* Right: Connection status */}
       <div className="flex items-center gap-4 relative z-10">
-        <div className="flex flex-col items-end">
-          <div className="text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-1">Telemetry Loopback</div>
-          <div className="text-zinc-300 text-xs font-mono">127.0.0.1:8000</div>
+        <div className="hidden 2xl:flex items-center gap-2 border border-neon-cyan/20 bg-neon-cyan/5 px-2 py-1 rounded">
+          <span className="text-neon-cyan text-[8px] font-mono font-bold tracking-widest uppercase">UI:5173</span>
+          <span className="w-1 h-1 rounded-full bg-neon-cyan/30"></span>
+          <span className="text-zinc-400 text-[8px] font-mono tracking-widest uppercase">API:8000</span>
+          <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
+          <span className="text-zinc-500 text-[8px] font-mono tracking-widest uppercase">{import.meta.env.MODE === 'development' ? 'DEV' : 'PROD'}</span>
         </div>
-        <CapabilityBadge label="API" status={connectionStatus} compact />
+
+        <div className="flex items-center gap-4 text-xs font-mono">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setApiInspectorOpen(true)}
+            className="text-zinc-500 hover:text-neon-cyan hidden md:flex"
+            tooltip="Inspect API Payloads"
+          >
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+            DEV_INSPECT
+          </Button>
+          
+          <div className="flex flex-col items-end border-l border-zinc-800/80 pl-4 ml-2">
+            <div className="text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-1">Telemetry Loopback</div>
+            <div className="text-zinc-300 text-xs font-mono">127.0.0.1:8000</div>
+          </div>
+          <CapabilityBadge label="API" status={connectionStatus} compact />
+          
+          <div className="pl-4 ml-2 border-l border-zinc-800">
+            <Button variant="ghost" size="icon" onClick={() => setHistoryOpen(true)} tooltip="Toggle History Workspace">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </Button>
+          </div>
+        </div>
       </div>
     </header>
+
+    <HistoryWorkspace isOpen={historyOpen} onClose={() => setHistoryOpen(false)} />
+    <ApiInspectorModal isOpen={apiInspectorOpen} onClose={() => setApiInspectorOpen(false)} />
+    </>
   );
 };

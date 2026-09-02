@@ -21,6 +21,7 @@ from .routers import chat, ingest, status
 from .routers import agent as agent_router   # Phase 2
 from .routers import artifacts as artifact_router  # Phase 3
 from .routers import network as network_router     # Phase 3
+from .routers import upload as upload_router       # Phase 5
 from .model_manager import stop_all  # Phase 2
 
 # ---------------------------------------------------------------------------
@@ -37,7 +38,7 @@ logger = logging.getLogger(__name__)
 # Application
 # ---------------------------------------------------------------------------
 app = FastAPI(
-    title="MRPL Sovereign Agentic AI Workbench — Phase 3 API",
+    title="Dravexis AI API",
     description=(
         "Air-gapped agentic RAG workbench for MRPL refinery operations. "
         "LLM: llama-server (llama.cpp, CUDA 12.4). "
@@ -75,6 +76,7 @@ app.include_router(status.router)            # Phase 1: GET /network-status (kep
 app.include_router(agent_router.router)      # Phase 2: POST /agent/run
 app.include_router(artifact_router.router)   # Phase 3: POST /artifacts/generate
 app.include_router(network_router.router)    # Phase 3: GET /network/monitor
+app.include_router(upload_router.router)     # Phase 5: POST /upload/pdf
 
 
 # ---------------------------------------------------------------------------
@@ -93,8 +95,8 @@ async def on_shutdown() -> None:
 @app.get("/", tags=["root"])
 async def root() -> JSONResponse:
     return JSONResponse({
-        "service": "MRPL Agentic AI Workbench",
-        "phase": 3,
+        "service": "Dravexis AI",
+        "version": "1.0.0",
         "status": "running",
         "endpoints": [
             "/chat",
@@ -115,11 +117,55 @@ async def root() -> JSONResponse:
 
 
 # ---------------------------------------------------------------------------
+# Capabilities Endpoint (Task 5.2)
+# ---------------------------------------------------------------------------
+@app.get("/capabilities", tags=["root"])
+async def capabilities() -> JSONResponse:
+    from .model_manager import get_manager_state
+    from .routers.agent import _get_vision_probe_summary
+    from .config import settings
+
+    state = get_manager_state()
+    active = state.get("active_role")
+    probe = _get_vision_probe_summary()
+
+    return JSONResponse({
+        "reasoning": {
+            "status": "available",
+            "model": "DeepSeek-R1-1.5B",
+            "loaded": active == "reasoning",
+        },
+        "vision": {
+            "status": "available" if probe.get("status") == "ok" else "unavailable",
+            "model": "Qwen2.5-VL-3B",
+            "probe_ok": probe.get("status") == "ok",
+            "loaded": active == "vision",
+        },
+        "coder": {
+            "status": "available",
+            "model": "Qwen2.5-Coder-1.5B",
+            "loaded": active == "reasoning", # using reasoning model for code currently
+        },
+        "gpu": {
+            "status": "CPU_FALLBACK_OR_NO_GPU_OFFLOAD"
+        },
+        "sandbox": {
+            "status": "DEGRADED_SANDBOX",
+            "mode": "restricted_python"
+        },
+        "network": {
+            "status": "MONITOR_UNAVAILABLE",
+            "mode": "psutil_only"
+        }
+    })
+
+
+# ---------------------------------------------------------------------------
 # Entry point (for direct python main.py invocation)
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
     logger.info(
-        "Starting MRPL Agentic AI Workbench on http://%s:%d",
+        "Starting Dravexis AI on http://%s:%d",
         settings.api_host,
         settings.api_port,
     )

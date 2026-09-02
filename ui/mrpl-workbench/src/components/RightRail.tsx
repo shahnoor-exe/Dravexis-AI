@@ -3,18 +3,32 @@ import React, { useState, useEffect, useRef } from "react";
 import { useAgentStore } from "../store/agentStore";
 import { api } from "../lib/api";
 import { CapabilityBadge } from "./CapabilityBadge";
+import { PreviewPane } from "./PreviewPane";
 import gsap from "gsap";
+import { useHistoryStore } from "../store/historyStore";
 
 // ─── Audit Trace ────────────────────────────────────────────────────────────
 function AuditTrace() {
   const { events } = useAgentStore();
   const traceRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom
-  useEffect(() => {
-    if (traceRef.current) {
-      traceRef.current.scrollTop = traceRef.current.scrollHeight;
-    }
+  // Collapse events by node
+  const collapsedEvents = React.useMemo(() => {
+    const nodes = new Map<string, { name: string; status: string; ts: number }>();
+    events.forEach(ev => {
+      const nodeName = String(ev.node);
+      const existing = nodes.get(nodeName);
+      let status = "running";
+      if (ev.event === "exit") {
+        if (ev.status === "error") status = "error";
+        else if (ev.status === "VISION_UNAVAILABLE") status = "unavailable";
+        else status = "ok";
+      }
+      if (!existing || ev.event === "exit") {
+        nodes.set(nodeName, { name: nodeName, status, ts: ev.ts as number || Date.now() });
+      }
+    });
+    return Array.from(nodes.values());
   }, [events]);
 
   return (
@@ -26,21 +40,21 @@ function AuditTrace() {
       {events.length === 0 ? (
         <div className="text-zinc-700 text-xs font-mono">System standing by...</div>
       ) : (
-        <div ref={traceRef} className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-2 bg-black/40 p-3 rounded-lg border border-zinc-800/80 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
-          {events.map((ev, i) => (
+        <div ref={traceRef} className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-2 bg-slate-glass/50 p-3 rounded-sm border border-zinc-800/80 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
+          {collapsedEvents.map((ev, i) => (
             <div
               key={i}
               className={`flex items-start gap-2 text-[10px] font-mono leading-tight ${
-                ev.event === "enter" ? "text-neon-cyan" :
+                ev.status === "running" ? "text-neon-cyan font-bold tracking-wider" :
                 ev.status === "error" ? "text-red-400" :
-                ev.status === "VISION_UNAVAILABLE" ? "text-neon-amber" :
+                ev.status === "unavailable" ? "text-neon-amber" :
                 "text-zinc-400"
               }`}
             >
               <span className="text-zinc-600 shrink-0 font-bold">{String(i + 1).padStart(2, "0")}</span>
-              <span className="shrink-0">{ev.event === "enter" ? "▶" : ev.event === "exit" ? "■" : "·"}</span>
-              <span className={ev.event === "enter" ? "font-bold tracking-wider" : ""}>{String(ev.node)}</span>
-              {ev.status !== undefined && <span className="opacity-70">· {String(ev.status as string)}</span>}
+              <span className="shrink-0">{ev.status === "running" ? "▶" : "■"}</span>
+              <span className="flex-1">{ev.name}</span>
+              {ev.status !== "running" && <span className="opacity-70 text-[8px] uppercase">{ev.status}</span>}
             </div>
           ))}
         </div>
@@ -50,7 +64,7 @@ function AuditTrace() {
 }
 
 // ─── Artifact Shelf ─────────────────────────────────────────────────────────
-function ArtifactShelf() {
+function ArtifactShelf({ onPreview }: { onPreview: (fileName: string) => void }) {
   const { lastResponse, visionStatus, sandboxMode } = useAgentStore();
   const [generating, setGenerating] = useState<string | null>(null);
   const [results, setResults] = useState<Record<string, { status: string; file_name?: string; error?: string }>>({});
@@ -75,6 +89,18 @@ function ArtifactShelf() {
         sandbox_mode: sandboxMode,
       });
       setResults((prev) => ({ ...prev, [type]: r }));
+      
+      if (r.status === "ok") {
+        useHistoryStore.getState().saveArtifact({
+          id: crypto.randomUUID(),
+          sessionId: lastResponse.session_id,
+          timestamp: Date.now(),
+          type,
+          fileName: r.file_name || `Generated_${type.toUpperCase()}`,
+          sizeBytes: 0,
+          status: r.status
+        });
+      }
       
       // Flip back to reveal link
       gsap.to(card, { rotateY: "+=180", duration: 0.6, ease: "power2.inOut" });
@@ -109,7 +135,7 @@ function ArtifactShelf() {
                 key={id}
                 onClick={(e) => handleCardClick(e, id)}
                 disabled={!!generating}
-                className="relative w-full bg-zinc-900/80 border border-zinc-700/80 rounded-xl p-3 text-left transition-all duration-300 hover:border-neon-cyan hover:shadow-[0_0_15px_rgba(0,240,255,0.2)] disabled:opacity-50 disabled:cursor-not-allowed group"
+                className="relative w-full bg-slate-glass/50 border border-zinc-700/80 rounded-sm p-3 text-left transition-all duration-300 hover:border-neon-cyan hover:shadow-[0_0_15px_rgba(32,227,255,0.2)] disabled:opacity-50 disabled:cursor-not-allowed group"
                 style={{ transformStyle: "preserve-3d" }}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -120,20 +146,24 @@ function ArtifactShelf() {
                 </div>
                 {r ? (
                   r.status === "ok" ? (
-                    <a
-                      href={`http://127.0.0.1:8000/artifacts/download/${encodeURIComponent(r.file_name ?? "")}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-[10px] text-neon-emerald hover:underline break-all font-mono inline-block mt-1"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      ✓ {r.file_name}
-                    </a>
+                    <div className="mt-2 flex items-center justify-between gap-2" onClick={(e) => e.stopPropagation()}>
+                      <a
+                        href={`http://127.0.0.1:8000/artifacts/download/${encodeURIComponent(r.file_name ?? "")}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] text-neon-emerald hover:underline truncate font-mono inline-block flex-1"
+                      >
+                        ✓ {r.file_name}
+                      </a>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={() => r.file_name && onPreview(r.file_name)}>
+                        <svg className="w-3 h-3 text-neon-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                      </Button>
+                    </div>
                   ) : (
                     <div className="text-[10px] text-red-400 font-mono mt-1 break-all">✗ {r.error}</div>
                   )
                 ) : (
-                  <div className="text-[9px] text-zinc-600 font-mono mt-1">Click to generate securely...</div>
+                  <div className="text-[9px] text-zinc-600 font-mono mt-1">Click to Generate locally...</div>
                 )}
               </button>
             );
@@ -145,8 +175,11 @@ function ArtifactShelf() {
 }
 
 // ─── Network Monitor ─────────────────────────────────────────────────────────
+import { useSettingsStore } from "../store/settingsStore";
+
 function NetworkMonitorCard() {
   const [summary, setSummary] = useState<Record<string, unknown> | null>(null);
+  const { capabilities } = useSettingsStore();
   const waveRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -181,7 +214,7 @@ function NetworkMonitorCard() {
         Network Egress Sensor
       </h3>
       
-      <div className="bg-black/60 border border-neon-emerald/30 rounded-lg p-4 relative overflow-hidden group">
+      <div className="bg-slate-glass/50 border border-neon-emerald/30 rounded-sm p-4 relative overflow-hidden group">
         <div className="absolute inset-0 bg-neon-emerald/5 mix-blend-overlay"></div>
         
         {/* Real-time SVG Waveform */}
@@ -201,12 +234,12 @@ function NetworkMonitorCard() {
         </div>
 
         <div className="flex items-center gap-2 text-neon-emerald text-[10px] font-mono font-bold tracking-widest uppercase mb-3">
-          <span className="w-2 h-2 rounded-full bg-neon-emerald animate-pulse"></span>
-          0 Bps EXTERNAL EGRESS
+          <span className={`w-2 h-2 rounded-full ${capabilities?.network?.status === 'MONITOR_UNAVAILABLE' ? 'bg-amber-500' : 'bg-neon-emerald animate-pulse'}`}></span>
+          {capabilities?.network?.status === "MONITOR_UNAVAILABLE" ? "EXTERNAL EGRESS: UNKNOWN" : "0 Bps EXTERNAL EGRESS"}
         </div>
         
-        <div className="text-[9px] text-neon-emerald/70 font-mono border border-neon-emerald/20 bg-neon-emerald/10 px-2 py-1 rounded inline-block">
-          AIR-GAP VERIFIED (LOOPBACK 127.0.0.1)
+        <div className={`text-[9px] font-mono border px-2 py-1 rounded inline-block ${capabilities?.network?.status === 'MONITOR_UNAVAILABLE' ? 'text-amber-500/70 border-amber-500/20 bg-amber-500/10' : 'text-neon-emerald/70 border-neon-emerald/20 bg-neon-emerald/10'}`}>
+          {capabilities?.network?.status === "MONITOR_UNAVAILABLE" ? "PACKET CAPTURE UNAVAILABLE" : "AIR-GAPPABLE DESIGN — LOOPBACK ONLY"}
         </div>
 
         {!summary ? (
@@ -226,16 +259,23 @@ function NetworkMonitorCard() {
 }
 
 // ─── Right Rail ──────────────────────────────────────────────────────────────
-export const RightRail: React.FC = () => {
-  const { visionStatus, sandboxMode, error } = useAgentStore();
+import { Button } from "./ui/Button";
+
+export const RightRail: React.FC<{ width?: number }> = ({ width }) => {
+  const { lastResponse, runStatus, visionStatus, sandboxMode, error } = useAgentStore();
+  const isRunning = runStatus === 'running';
+  const [previewFile, setPreviewFile] = useState<string | null>(null);
 
   return (
-    <aside className="right-rail flex flex-col gap-5 w-72 min-w-[18rem] p-4 bg-cyber-obsidian border-l border-zinc-800/80 overflow-y-auto relative shadow-[-4px_0_24px_rgba(0,0,0,0.3)]">
-      <div className="absolute inset-0 scanlines opacity-15 mix-blend-overlay"></div>
+    <aside 
+      style={{ width: width ? `${width}px` : undefined }}
+      className="right-rail flex flex-col gap-4 w-80 min-w-[20rem] max-w-[50vw] p-4 bg-cyber-obsidian border-l border-zinc-800/80 overflow-y-auto relative z-0 shadow-[-4px_0_24px_rgba(0,0,0,0.3)] shrink-0 transition-[width] duration-75"
+    >
+      <div className="absolute inset-0 scanlines opacity-15 mix-blend-overlay pointer-events-none"></div>
       
       {/* Capability warnings */}
       {(visionStatus === "VISION_UNAVAILABLE" || sandboxMode === "DEGRADED_SANDBOX" || error) && (
-        <div className="bg-amber-950/20 border border-neon-amber/30 rounded-lg p-4 relative z-10">
+        <div className="bg-slate-glass/50 border border-neon-amber/30 rounded-sm p-4 relative z-10">
           <h3 className="text-neon-amber text-[10px] font-mono font-bold tracking-widest uppercase mb-3 flex items-center gap-2">
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             System Warnings
@@ -263,8 +303,10 @@ export const RightRail: React.FC = () => {
       )}
 
       <AuditTrace />
-      <div className="border-t border-zinc-800/80 pt-5"><ArtifactShelf /></div>
+      <div className="border-t border-zinc-800/80 pt-5"><ArtifactShelf onPreview={setPreviewFile} /></div>
       <div className="border-t border-zinc-800/80 pt-5 flex-1"><NetworkMonitorCard /></div>
+
+      <PreviewPane fileName={previewFile} onClose={() => setPreviewFile(null)} />
     </aside>
   );
 };

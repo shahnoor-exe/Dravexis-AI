@@ -89,7 +89,7 @@ def generate(
         ws_sum.column_dimensions["A"].width = 28
         ws_sum.column_dimensions["B"].width = 60
 
-        ws_sum["A1"] = "MRPL Sovereign AI Workbench — Demo Analysis"
+        ws_sum["A1"] = "Dravexis AI — Demo Analysis"
         ws_sum["A1"].font = Font(bold=True, size=14, color="1F3864")
         ws_sum.merge_cells("A1:B1")
 

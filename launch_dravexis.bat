@@ -1,5 +1,5 @@
 @echo off
-:: launch_dravexis.bat — Dravexis On-Prem Agentic Control Layer launcher
+:: launch_dravexis.bat — Dravexis AI launcher
 :: Hardened against path spaces (SIH 2026 PS 117), silent exits, and llama-server deadlock.
 ::
 :: Architecture note: llama-server is managed on-demand by model_manager.py.
@@ -14,7 +14,7 @@ cd /d "%ROOT%"
 
 echo.
 echo =====================================================================
-echo  Dravexis -- On-Prem Agentic Control Layer
+echo  Dravexis AI
 echo  Project root: "%ROOT%"
 echo =====================================================================
 echo.
@@ -85,7 +85,7 @@ echo [OK] Port 8000 is clean.
 :: --- 7. Start FastAPI backend in its own titled window ---
 echo [1/2] Launching FastAPI Backend Gateway...
 echo       (llama-server will spawn automatically on first agent query)
-start "Dravexis Backend Gateway" cmd /k "cd /d ""%ROOT%"" && set ""PYTHONUTF8=1"" && python -m uvicorn src.main:app --host 127.0.0.1 --port 8000"
+start "Dravexis AI Backend Gateway" cmd /k "cd /d ""%ROOT%"" && set ""PYTHONUTF8=1"" && python -m uvicorn src.main:app --host 127.0.0.1 --port 8000"
 
 :: --- 8. Poll FastAPI health (max 15s — should be ready in ~2-3s) ---
 echo       Waiting for FastAPI to be ready (max 15s)...
@@ -104,7 +104,7 @@ for /L %%i in (1,1,15) do (
 
 if "!READY!"=="0" (
     echo [ERROR] FastAPI did not respond within 15s.
-    echo         Check the "Dravexis Backend Gateway" terminal window for errors.
+    echo         Check the "Dravexis AI Backend Gateway" terminal window for errors.
     goto :FAIL
 )
 echo [OK] FastAPI ready at http://127.0.0.1:8000
@@ -122,7 +122,7 @@ if not exist "%ROOT%\ui\mrpl-workbench\package.json" (
 :: --- 9. Start Vite dev server in its own window ---
 echo.
 echo [2/2] Launching Vite Web Server (npm run dev, port 1420)...
-start "Dravexis Web Server" cmd /k "cd /d ""%ROOT%\ui\mrpl-workbench"" && npm run dev"
+start "Dravexis AI Web Server" cmd /k "cd /d ""%ROOT%\ui\mrpl-workbench"" && npm run dev"
 
 echo       Waiting 3s for Vite to bind...
 timeout /t 3 /nobreak >nul
@@ -134,7 +134,7 @@ start http://localhost:1420/
 :DONE
 echo.
 echo =====================================================================
-echo  Dravexis is running!
+echo  Dravexis AI is running!
 echo.
 echo   FastAPI Backend  : http://127.0.0.1:8000
 echo   API Docs         : http://127.0.0.1:8000/docs

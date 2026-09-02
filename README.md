@@ -1,4 +1,4 @@
-# 🛡️ Dravexis — On-Prem Agentic Control Layer
+# 🛡️ Dravexis AI
 
 <div align="center">
 
@@ -54,7 +54,7 @@ This single robust launcher:
 
 ## 🏗️ Architecture & Stack
 
-Dravexis orchestrates a sequential agentic workflow via a finite state machine, grounding responses in a local vector database. 
+Dravexis AI orchestrates a sequential agentic workflow via a finite state machine, grounding responses in a local vector database. 
 
 ```mermaid
 graph TD
@@ -89,7 +89,7 @@ graph TD
 | **API Gateway** | FastAPI + Uvicorn | `127.0.0.1:8000` |
 | **Embeddings** | FastEmbed BGE-large-en-v1.5 (dim=1024) | in-process |
 | **Vector Store** | Qdrant Embedded (on-disk) | in-process |
-| **Frontend** | React 19 + Tauri v2 (Rust) + GSAP | `localhost:1420` |
+| **Frontend** | React 19 + Tauri v2 (Rust) + GSAP | `localhost:5173` |
 
 ---
 
@@ -119,7 +119,7 @@ We use the highly efficient **DeepSeek-R1-Distill-Qwen-1.5B** and **Qwen2.5-Code
 
 ## 📚 Knowledge Retrieval (RAG)
 
-Dravexis uses advanced embedding chunking strategies to parse highly technical MRPL refinery documents.
+Dravexis AI uses advanced embedding chunking strategies to parse highly technical MRPL refinery documents.
 
 | Parameter | Value | Rationale |
 |---|---|---|
@@ -132,7 +132,7 @@ Dravexis uses advanced embedding chunking strategies to parse highly technical M
 
 ## 🔒 Security & Telemetry
 
-Dravexis is built for environments where data cannot leave the room. 
+Dravexis AI is built for environments where data cannot leave the room. 
 - The **Network Monitor** (`/network/monitor/summary`) actively tracks loopback processes.
 - **No external API calls** are made during execution.
 - Project checkpoints, logs, and evidence JSONs are automatically excluded via `.gitignore` to prevent data leakage.

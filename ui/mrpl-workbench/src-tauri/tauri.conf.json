@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "mrpl-workbench",
+  "productName": "Dravexis AI",
   "version": "0.1.0",
   "identifier": "com.mrpl.aiworkbench",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "mrpl-workbench",
+        "title": "Dravexis AI",
         "width": 800,
         "height": 600
       }
