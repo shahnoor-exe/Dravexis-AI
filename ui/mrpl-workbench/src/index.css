@@ -3,12 +3,14 @@
 
 :root {
   color-scheme: dark;
-  --cyber-bg: #050811;
-  --cyber-obsidian: #0b0f19;
-  --neon-cyan: #00f0ff;
-  --neon-magenta: #ff0055;
-  --neon-emerald: #00ff66;
-  --neon-amber: #ff9900;
+  --cyber-bg: #070A0F;
+  --cyber-obsidian: #070A0F;
+  --slate-glass: rgba(18, 25, 38, 0.78);
+  --neon-cyan: #20E3FF;
+  --neon-magenta: #FF3EA5;
+  --neon-emerald: #38E6A5;
+  --neon-amber: #FFB547;
+  --muted-steel: #718096;
 }
 
 * {
@@ -178,3 +180,49 @@ textarea { font-family: inherit; }
   .left-rail { display: none !important; }
   .right-rail { min-width: 14rem !important; width: 14rem !important; }
 }
+
+/* ─── Landing Page Animations ─── */
+@keyframes landing-radial-glow {
+  0% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 0.5; }
+}
+
+.bg-radial-hero {
+  background: radial-gradient(circle at center, rgba(32, 227, 255, 0.08) 0%, transparent 60%);
+  animation: landing-radial-glow 8s ease-in-out infinite;
+}
+
+@keyframes sweep-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.radar-sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(32, 227, 255, 0.5), transparent);
+  box-shadow: 0 0 10px rgba(32, 227, 255, 0.8);
+  animation: sweep-line 6s linear infinite;
+  pointer-events: none;
+}
+
+/* ─── Accessibility: Reduced Motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .scanlines, .radar-sweep {
+    display: none !important;
+  }
+}
+

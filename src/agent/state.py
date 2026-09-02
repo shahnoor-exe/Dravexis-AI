@@ -44,6 +44,11 @@ class AgentState(TypedDict, total=False):
     vision_status: str            # "ok" | "VISION_UNAVAILABLE" | "error"
 
     # ------------------------------------------------------------------ #
+    # PDF Upload                                                           #
+    # ------------------------------------------------------------------ #
+    uploaded_pdf_text: Optional[str]
+
+    # ------------------------------------------------------------------ #
     # Code generation                                                      #
     # ------------------------------------------------------------------ #
     generated_code: Optional[str]
@@ -101,14 +106,15 @@ def make_initial_state(
         confidence=0.0,
         method="",
         required_tools=[],
-        requires_vision=bool(image_path),
-        requires_code=False,
+        requires_vision=bool(image_path) or intent_override == "vision",
+        requires_code=intent_override == "code",
         retrieved_chunks=[],
         retrieval_score_max=0.0,
         insufficient_evidence=False,
         vision_input=image_path,
         vision_result=None,
         vision_status="not_requested",
+        uploaded_pdf_text=None,
         generated_code=None,
         code_schema_valid=False,
         code_declared_inputs={},

@@ -5,6 +5,9 @@ import { useAgentRun } from "../hooks/useAgentRun";
 import { EvidencePanel } from "./EvidencePanel";
 import { CapabilityBadge } from "./CapabilityBadge";
 import { useQuerySubmitAnimation, usePanelSwitchAnimation } from "../hooks/useGSAPAnimations";
+import { Button } from "./ui/Button";
+import { useHistoryStore } from "../store/historyStore";
+import { MediaTray } from "./MediaTray";
 
 type Tab = "chat" | "evidence" | "code" | "sandbox";
 
@@ -19,7 +22,9 @@ export const CenterStage: React.FC = () => {
   const {
     query, setQuery, runStatus, intent, confidence,
     finalAnswer, error, visionStatus, sandboxMode, codeStatus,
-    latencyMs, events,
+    latencyMs, events, uploadedImagePath, setUploadedImagePath, setSessionId,
+    intentOverride, setIntentOverride,
+    hitlEnabled, setHitlEnabled, hitlState, setHitlState, hitlCode, setHitlCode, triggerHitlMock
   } = useAgentStore();
   const { run, isRunning } = useAgentRun();
 
@@ -42,6 +47,90 @@ export const CenterStage: React.FC = () => {
     // Don't auto-run, let the user hit submit to see the text
   };
 
+  const handleRunSubmit = () => {
+    if (hitlEnabled && hitlState === "none") {
+      triggerHitlMock();
+    } else {
+      run();
+    }
+  };
+
+  const [isUploading, setIsUploading] = useState(false);
+  const [attachedFileName, setAttachedFileName] = useState<string | null>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setAttachedFileName(file.name);
+    
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      setAttachedFileName(`Error: File too large (>10MB)`);
+      setIsUploading(false);
+      return;
+    }
+    
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      if (file.type === "application/pdf") {
+        const res = await fetch("http://127.0.0.1:8000/upload/pdf", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.status === "ok") {
+          setSessionId(data.session_id);
+          setQuery("What is this PDF about?");
+          
+          useHistoryStore.getState().saveMedia({
+            id: crypto.randomUUID(),
+            sessionId: data.session_id,
+            timestamp: Date.now(),
+            type: "pdf",
+            originalName: file.name,
+            sizeBytes: file.size,
+            status: "ok"
+          });
+        } else {
+          setAttachedFileName(`Error: ${data.final_answer}`);
+        }
+      } else if (file.type.startsWith("image/")) {
+        const res = await fetch("http://127.0.0.1:8000/upload/image", {
+          method: "POST",
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.status === "ok") {
+          setUploadedImagePath(data.image_path);
+          setQuery("Describe this image.");
+          
+          useHistoryStore.getState().saveMedia({
+            id: crypto.randomUUID(),
+            sessionId: "local-vision",
+            timestamp: Date.now(),
+            type: "image",
+            originalName: file.name,
+            sizeBytes: file.size,
+            status: "ok"
+          });
+        } else {
+          setAttachedFileName(`Error: ${data.error}`);
+        }
+      } else {
+        setAttachedFileName("Unsupported file type");
+      }
+    } catch (err) {
+      setAttachedFileName("Upload failed");
+    } finally {
+      setIsUploading(false);
+      // Reset input
+      e.target.value = '';
+    }
+  };
+
   const TABS: { id: Tab; label: string }[] = [
     { id: "chat", label: "EXECUTION CONSOLE" },
     { id: "evidence", label: `EVIDENCE BUFFER${useAgentStore.getState().evidence.length > 0 ? ` (${useAgentStore.getState().evidence.length})` : ""}` },
@@ -55,35 +144,79 @@ export const CenterStage: React.FC = () => {
       <div className="absolute inset-0 grid-overlay pointer-events-none"></div>
       
       {/* Query Composer */}
-      <div className="p-5 border-b border-zinc-800/80 relative z-10 bg-zinc-950/80 backdrop-blur-sm">
+      <div className="p-5 border-b border-zinc-800/80 relative z-10 bg-slate-glass/30 backdrop-blur-md">
         
-        {/* Pre-loaded Action Chips */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {DEMO_PROMPTS.map((demo, idx) => (
-            <button
-              key={idx}
-              onClick={() => handleDemoClick(demo.query)}
-              className="px-3 py-1.5 bg-zinc-900/80 border border-zinc-700/80 rounded-md text-[11px] font-mono text-zinc-400 hover:text-neon-cyan hover:border-neon-cyan/50 hover:bg-neon-cyan/10 transition-all duration-300 flex items-center gap-2"
-              title={demo.query}
+        {/* Top bar of composer: Action Chips & Mode Selector */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div className="flex flex-wrap gap-2">
+            {DEMO_PROMPTS.map((demo, idx) => (
+              <Button
+                key={idx}
+                variant="ghost"
+                size="sm"
+                onClick={() => handleDemoClick(demo.query)}
+                tooltip={demo.query}
+                leftIcon={<span>{demo.icon}</span>}
+              >
+                {demo.label}
+              </Button>
+            ))}
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Force Mode:</span>
+            <select
+              className="bg-black/50 border border-zinc-700/80 text-neon-cyan text-[10px] font-mono p-1 rounded-sm focus:outline-none focus:border-neon-cyan/50"
+              value={intentOverride || ""}
+              onChange={(e) => setIntentOverride(e.target.value === "" ? null : e.target.value)}
+              disabled={isRunning}
             >
-              <span>{demo.icon}</span>
-              {demo.label}
-            </button>
-          ))}
+              <option value="">AUTO (Router)</option>
+              <option value="rag">RAG (Refinery Knowledge)</option>
+              <option value="code">CODE (AST Sandbox)</option>
+              <option value="vision">VISION (Optical Sensor)</option>
+              <option value="code_explanation">EXPLAIN (No Sandbox)</option>
+              <option value="system">SYSTEM (Artifacts)</option>
+            </select>
+          </div>
+
+          <label className="flex items-center gap-2 cursor-pointer ml-4">
+            <input 
+              type="checkbox" 
+              className="form-checkbox h-3 w-3 text-neon-amber bg-black border-zinc-700 focus:ring-0 focus:ring-offset-0 rounded-sm" 
+              checked={hitlEnabled} 
+              onChange={(e) => setHitlEnabled(e.target.checked)}
+              disabled={isRunning || runStatus === "hitl_awaiting"}
+            />
+            <span className="text-[10px] font-mono text-neon-amber uppercase tracking-widest mt-0.5">Force HITL Gate</span>
+          </label>
         </div>
+
+        <MediaTray />
 
         <div className="relative group">
           <textarea
             id="query-composer"
             data-anim="query-composer"
-            className="w-full bg-zinc-900/50 border border-zinc-700/80 rounded-xl px-5 pt-4 pb-12 text-zinc-100 text-sm font-mono resize-none focus:outline-none focus:border-neon-cyan/80 focus:ring-1 focus:ring-neon-cyan/50 placeholder:text-zinc-600 transition-all duration-300 backdrop-blur-md"
+            className="w-full bg-black/40 border border-zinc-700/80 rounded-sm px-5 pt-4 pb-16 text-zinc-100 text-sm font-mono resize-none focus:outline-none focus:border-neon-cyan/80 focus:ring-1 focus:ring-neon-cyan/50 placeholder:text-zinc-600 transition-all duration-300 backdrop-blur-sm"
             rows={3}
             placeholder="[TERMINAL_INPUT] > Enter query or select a demo above..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={isRunning}
+            disabled={isRunning || isUploading}
           />
+          
+          {/* Upload Button & Status */}
+          <div className="absolute left-4 bottom-4 flex items-center gap-3">
+            <label className="cursor-pointer text-zinc-400 hover:text-neon-cyan transition-colors" title="Attach Document/Image">
+              <input type="file" className="hidden" accept=".pdf,image/*" onChange={handleFileUpload} disabled={isRunning || isUploading} />
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
+            </label>
+            {isUploading && <span className="text-[10px] text-neon-cyan animate-pulse font-mono">UPLOADING...</span>}
+          </div>
           <div className="absolute right-4 bottom-4 flex items-center gap-3">
             {isRunning && (
               <span className="text-neon-magenta text-[10px] font-mono uppercase tracking-widest animate-pulse flex items-center gap-2">
@@ -91,16 +224,16 @@ export const CenterStage: React.FC = () => {
                 {activeNode ? `EXECUTING: ${activeNode}` : "PROCESSING..."}
               </span>
             )}
-            <button
+            <Button
               id="btn-submit-query"
-              onClick={run}
-              disabled={isRunning || !query.trim()}
-              className="px-6 py-2 bg-neon-cyan/20 border border-neon-cyan hover:bg-neon-cyan/30 disabled:bg-zinc-800/50 disabled:border-zinc-700 disabled:text-zinc-500 text-neon-cyan disabled:shadow-none glow-cyan text-xs font-bold tracking-widest uppercase rounded-lg transition-all duration-300"
+              variant="primary"
+              size="lg"
+              onClick={handleRunSubmit}
+              disabled={isRunning || isUploading || (!query.trim() && !uploadedImagePath) || runStatus === "hitl_awaiting"}
             >
               {isRunning ? "RUNNING" : "INITIALIZE"}
-            </button>
+            </Button>
           </div>
-          <div className="absolute left-4 bottom-4 text-[10px] text-zinc-500 font-mono">CTRL+ENTER to execute</div>
         </div>
 
         {/* Telemetry Readout Strip */}
@@ -113,8 +246,18 @@ export const CenterStage: React.FC = () => {
               <CapabilityBadge label="Sandbox" status="DEGRADED_SANDBOX" compact />
             )}
             {latencyMs !== null && (
-              <span className="latency-badge">
+              <span className="latency-badge" title="End-to-End Latency">
                 ⏱ {(latencyMs / 1000).toFixed(1)}s
+              </span>
+            )}
+            {useAgentStore.getState().lastResponse?.model_switch_latency_ms != null && (
+              <span className="text-[9px] text-zinc-400 font-mono bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800" title="Model Load Time">
+                LD: <span className="text-neon-cyan">{(useAgentStore.getState().lastResponse!.model_switch_latency_ms! / 1000).toFixed(1)}s</span>
+              </span>
+            )}
+            {useAgentStore.getState().evidence.length > 0 && (
+              <span className="text-[9px] text-zinc-400 font-mono bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800" title="Qdrant Retrieval Count">
+                VDB: <span className="text-neon-cyan">{useAgentStore.getState().evidence.length}</span>
               </span>
             )}
             {intent && (
@@ -157,7 +300,7 @@ export const CenterStage: React.FC = () => {
                 <div className="text-[10px] mt-1 opacity-60">Awaiting execution command...</div>
               </div>
             )}
-            {runStatus === "running" && (
+            {isRunning && (
               <div className="flex flex-col items-center justify-center text-neon-cyan h-64 border border-neon-cyan/20 border-dashed rounded-xl bg-neon-cyan/5">
                 <div className="w-8 h-8 border-2 border-neon-cyan/30 border-t-neon-cyan rounded-full animate-spin mb-4"></div>
                 <div className="text-xs font-mono uppercase tracking-widest animate-pulse">
@@ -165,27 +308,87 @@ export const CenterStage: React.FC = () => {
                 </div>
               </div>
             )}
-            {error && (
-              <div className="bg-red-950/40 border border-red-500/50 rounded-xl p-5 shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-                <div className="flex items-center gap-2 text-red-400 font-mono text-xs tracking-widest mb-2 uppercase">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                  System Exception
+            {runStatus === "hitl_awaiting" && (
+              <div className="bg-cyber-obsidian border border-neon-amber/50 rounded-sm p-6 shadow-2xl relative animate-fade-in">
+                <div className="absolute top-0 left-0 w-1 h-full bg-neon-amber glow-amber"></div>
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-zinc-800">
+                  <h3 className="text-neon-amber font-mono text-xs uppercase tracking-widest flex items-center gap-2">
+                    <svg className="w-4 h-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Sandbox Execution Paused (DEMO_APPROVAL)
+                  </h3>
+                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded uppercase ${hitlState === 'awaiting_approval' ? 'bg-zinc-800 text-zinc-400' : 'bg-neon-cyan/20 text-neon-cyan'}`}>
+                    {hitlState === 'awaiting_approval' ? 'AWAITING APPROVAL' : hitlState}
+                  </span>
                 </div>
-                <div className="text-red-200/80 text-xs font-mono bg-black/40 p-3 rounded">{error}</div>
-                <div className="mt-3 text-[10px] text-red-500/80 font-mono uppercase">
-                  VERIFY BACKEND CONNECTION AND start_all.ps1 PROCESS
+                <div className="mb-4">
+                  <p className="text-[10px] text-zinc-400 font-mono mb-2">The reasoning engine requested to execute the following AST code. Please review.</p>
+                  <textarea 
+                    className="w-full bg-[#0b0f19] border border-zinc-700/80 rounded p-3 text-neon-cyan text-[11px] font-mono h-40 focus:outline-none focus:border-neon-amber"
+                    value={hitlCode || ""}
+                    onChange={(e) => setHitlCode(e.target.value)}
+                  />
+                </div>
+                <div className="flex gap-3 justify-end mt-4">
+                  <Button variant="ghost" size="sm" onClick={() => { setHitlState('none'); useAgentStore.getState().reset(); }}>Reject & Cancel</Button>
+                  <Button variant="primary" size="sm" className="bg-neon-amber hover:bg-neon-amber/80 text-black border-none" onClick={() => { setHitlState('approved'); run(); }}>
+                    Approve & Execute
+                  </Button>
                 </div>
               </div>
             )}
-            {finalAnswer && (
-              <div data-anim="answer-panel" className="bg-zinc-900/60 border border-neon-cyan/30 rounded-xl p-6 shadow-[0_0_20px_rgba(0,240,255,0.1)] backdrop-blur-md relative overflow-hidden animate-fade-in">
-                <div className="absolute top-0 left-0 w-1 h-full bg-neon-cyan glow-cyan"></div>
-                <div className="flex items-center gap-3 mb-5 pb-3 border-b border-zinc-800/80">
-                  <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded bg-black/50 ${runStatus === "partial" ? "text-neon-amber border border-neon-amber/50 glow-amber" : "text-neon-emerald border border-neon-emerald/50 glow-emerald"}`}>
-                    {runStatus === "partial" ? "⚠ PARTIAL OUTPUT" : "✓ EXECUTION SUCCESS"}
-                  </span>
-                  {intent && <span className="text-[10px] font-mono text-neon-cyan">MODE: {intent}</span>}
+            {error && (
+              <div className="bg-red-950/40 border border-red-500/50 rounded-sm p-5 shadow-[0_0_15px_rgba(239,68,68,0.2)] relative overflow-hidden animate-fade-in">
+                <div className="absolute top-0 left-0 w-1 h-full bg-red-500 glow-red"></div>
+                <div className="flex items-center gap-2 text-red-400 font-mono text-xs tracking-widest mb-2 uppercase">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                  System Exception {typeof error === "object" && error !== null ? `[${(error as any).code}]` : ""}
                 </div>
+                <div className="text-red-200/80 text-xs font-mono bg-black/40 p-3 rounded mb-4 border border-red-900/50">
+                  {typeof error === "object" && error !== null ? (error as any).message : String(error)}
+                </div>
+                <div className="flex gap-3 items-center">
+                  <Button variant="ghost" size="sm" onClick={() => useAgentStore.getState().reset()} className="text-zinc-400 border-zinc-700 hover:text-white">Dismiss</Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleRunSubmit()} className="text-neon-cyan border-neon-cyan/50 hover:bg-neon-cyan/10">Retry Request</Button>
+                  {typeof error === "object" && error !== null && ((error as any).code === "MODEL_SWITCH_FAILED" || (error as any).code === "VISION_UNAVAILABLE") && (
+                    <Button variant="ghost" size="sm" onClick={() => window.location.reload()} className="text-neon-amber border-neon-amber/50 hover:bg-neon-amber/10">Recheck Capabilities</Button>
+                  )}
+                </div>
+                <div className="mt-4 pt-3 border-t border-red-900/30 text-[9px] text-red-500/60 font-mono uppercase tracking-widest flex items-center justify-between">
+                  <span>VERIFY BACKEND CONNECTION AND start_all.ps1 PROCESS</span>
+                  {typeof error === "object" && error !== null && (error as any).code === "LLAMA_SERVER_UNREACHABLE" && (
+                    <span className="text-red-400">STATUS: DISCONNECTED</span>
+                  )}
+                </div>
+              </div>
+            )}
+            {finalAnswer && (runStatus === "completed" || runStatus === "partial") && (
+              <div data-anim="answer-panel" className="bg-slate-glass/60 border border-neon-cyan/30 rounded-sm p-6 shadow-[0_0_20px_rgba(32,227,255,0.1)] backdrop-blur-md relative overflow-hidden animate-fade-in">
+                <div className="absolute top-0 left-0 w-1 h-full bg-neon-cyan glow-cyan"></div>
+                <div className="flex items-center justify-between mb-5 pb-3 border-b border-zinc-800/80">
+                  <div className="flex items-center gap-3">
+                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-sm bg-black/50 ${runStatus === "partial" ? "text-neon-amber border border-neon-amber/50 glow-amber" : "text-neon-emerald border border-neon-emerald/50 glow-emerald"}`}>
+                      {runStatus === "partial" ? "⚠ PARTIAL OUTPUT" : "✓ EXECUTION SUCCESS"}
+                    </span>
+                    {intent && <span className="text-[10px] font-mono text-neon-cyan">MODE: {intent}</span>}
+                  </div>
+                  {/* Grounding Label */}
+                  {intent === "rag" || intent === "vision" ? (
+                    <span className={`text-[9px] font-mono uppercase tracking-widest px-2 py-0.5 rounded-sm border ${
+                      useAgentStore.getState().evidence.length > 0 ? "bg-neon-emerald/10 text-neon-emerald border-neon-emerald/30" : "bg-neon-amber/10 text-neon-amber border-neon-amber/30"
+                    }`}>
+                      {useAgentStore.getState().evidence.length > 0 ? "GROUNDED IN LOCAL CORPUS" : "NO CORPUS EVIDENCE"}
+                    </span>
+                  ) : null}
+                </div>
+                
+                {/* PDF Truncation Warning */}
+                {events.some(e => e.truncated === true) && (
+                  <div className="mb-4 bg-amber-950/40 border-l-2 border-neon-amber p-2 text-[10px] font-mono text-amber-200/80 flex items-center gap-2">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    PDF context exceeded max tokens (10000 chars) and was safely truncated to prevent buffer overflow.
+                  </div>
+                )}
+
                 <div className="text-neon-cyan/90 text-sm leading-relaxed whitespace-pre-wrap font-mono relative">
                   <div className="absolute -left-3 top-0 bottom-0 border-l border-neon-cyan/20"></div>
                   {finalAnswer}
@@ -217,17 +420,17 @@ export const CenterStage: React.FC = () => {
         )}
 
         {tab === "sandbox" && (
-          <div className="bg-orange-950/20 border border-neon-amber/30 rounded-xl p-5 relative overflow-hidden">
+          <div className="bg-orange-950/20 border border-neon-amber/30 rounded-sm p-5 relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-neon-amber"></div>
             <div className="text-neon-amber font-mono text-xs tracking-widest mb-3 uppercase flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
               Sandbox Mode: DEGRADED_SANDBOX
             </div>
-            <div className="text-orange-200/70 text-[11px] mb-4 font-mono max-w-2xl leading-relaxed">
+            <div className="text-amber-200/70 text-[11px] mb-4 font-mono max-w-2xl leading-relaxed">
               Docker is not installed on this node. Code runs in-process with strict AST allowlisting.
               This is NOT container isolation. The label DEGRADED_SANDBOX is mathematically intentional and accurate for this rehearsal.
             </div>
-            <div className="font-mono text-[10px] text-neon-cyan bg-black/50 p-3 rounded border border-zinc-800">
+            <div className="font-mono text-[10px] text-neon-cyan bg-black/50 p-3 rounded-sm border border-zinc-800">
               {sandboxMode === "not_run"
                 ? "Sandbox was not invoked for this query."
                 : `Active sandbox mode: ${sandboxMode}`}

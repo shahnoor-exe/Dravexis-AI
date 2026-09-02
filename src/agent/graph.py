@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re as _re
 import time
 import uuid
 from pathlib import Path
@@ -39,6 +40,21 @@ from ..model_manager import switch_model
 from .state import AgentState
 from .router import route, RouterResult
 from .sandbox import execute as sandbox_execute, validate_code_schema
+
+
+def _clean_llm_output(text: str) -> str:
+    """Strip DeepSeek-R1 <think> blocks, stray tags, and echoed prompt prefixes."""
+    if not text:
+        return text
+    # Remove <think>...</think> blocks (greedy, multiline)
+    text = _re.sub(r"<think>[\s\S]*?</think>", "", text)
+    # Remove stray opening/closing tags
+    text = _re.sub(r"</?think>", "", text)
+    # Remove echoed ChatML tags
+    text = _re.sub(r"<\|im_start\|>[\s\S]*?<\|im_end\|>", "", text)
+    text = _re.sub(r"<\|im_start\|>.*", "", text)
+    # Strip leading/trailing whitespace
+    return text.strip()
 from .checkpoint_adapter import get_checkpointer
 
 logger = logging.getLogger(__name__)
@@ -47,12 +63,19 @@ logger = logging.getLogger(__name__)
 # Helpers                                                                      #
 # --------------------------------------------------------------------------- #
 
+_event_seq = 0
+
 def _evt(state: AgentState, node: str, phase: str, **kwargs) -> AgentState:
     """Append an event to state.events and return updated state."""
+    global _event_seq
+    _event_seq += 1
     events = list(state.get("events", []))
     events.append({
+        "event_id": f"{node}_{phase}_{_event_seq}",
+        "seq": _event_seq,
         "ts": time.time(),
         "node": node,
+        "event": phase,
         "phase": phase,
         **kwargs,
     })
@@ -109,9 +132,9 @@ def node_plan(state: AgentState) -> AgentState:
 
     intent = state.get("intent", "unknown")
 
-    # For pure RAG, skip calling the LLM for plan — just record intent as plan
-    if intent == "rag":
-        plan = f"Intent: RAG. Retrieve relevant context for: '{query[:120]}'"
+    # For pure RAG or PDF, skip calling the LLM for plan — just record intent as plan
+    if intent in ("rag", "pdf_question"):
+        plan = f"Intent: {intent}. Retrieve relevant context for: '{query[:120]}'"
         state = {**state, "plan_summary": plan, "active_model_role": None}
         state = _evt(state, "plan", "exit", plan_summary=plan, model_called=False)
         return state
@@ -200,6 +223,19 @@ def node_vision(state: AgentState) -> AgentState:
     state = _evt(state, "vision", "enter")
 
     probe = _get_vision_probe()
+
+    image_path = state.get("vision_input")
+    if not image_path:
+        # No image was attached — this is a user error, not a capability failure
+        state = {
+            **state,
+            "vision_status": "VISION_NO_IMAGE",
+            "vision_result": None,
+            "error": "No image attached. Please upload an image or provide a path to a local image in data/.",
+        }
+        state = _evt(state, "vision", "exit", status="VISION_NO_IMAGE", reason="no image attached")
+        return state
+
     if probe.get("status") != "ok":
         reason = probe.get("reason", "probe not run")
         state = {
@@ -211,25 +247,20 @@ def node_vision(state: AgentState) -> AgentState:
         state = _evt(state, "vision", "exit", status="VISION_UNAVAILABLE", reason=reason)
         return state
 
-    image_path = state.get("vision_input")
-    if not image_path:
-        state = {**state, "vision_status": "VISION_UNAVAILABLE", "vision_result": None}
-        state = _evt(state, "vision", "exit", status="VISION_UNAVAILABLE", reason="no image path")
-        return state
-
-    # With a real vision model running via llama-server --mmproj,
-    # we'd call a multimodal endpoint here. Since models aren't downloaded yet,
-    # this will always come through as VISION_UNAVAILABLE via the probe result.
-    # When models are present, probe.status = "ok" and we call the model endpoint.
+    # Vision model available and image provided — run inference
     try:
         from ..llm_client import vision_completion  # type: ignore
-        switch_model("vision")
-        result = vision_completion(image_path=image_path, prompt="Describe this P&ID diagram.")
+        switch_result = switch_model("vision")
+        if not switch_result.get("success"):
+            raise RuntimeError(f"MODEL_SWITCH_FAILED: {switch_result.get('error')}")
+        result = vision_completion(image_path=image_path, prompt="Describe this P&ID diagram in detail.")
+        cleaned = _clean_llm_output(result.get("content", ""))
         state = {
             **state,
             "vision_status": "ok",
-            "vision_result": result.get("content", ""),
+            "vision_result": cleaned,
             "active_model_role": "vision",
+            "model_switch_latency_ms": switch_result.get("cold_start_ms"),
         }
         state = _evt(state, "vision", "exit", status="ok")
     except Exception as exc:
@@ -419,84 +450,186 @@ def node_compile_result(state: AgentState) -> AgentState:
     reflect_decision = state.get("reflect_decision", "")
     sandbox_stdout = state.get("sandbox_stdout", "") or ""
     retrieved = state.get("retrieved_chunks", [])
+    query = state.get("query", "")
+    source_type = "none"
 
+    # --- Error path ---
     if error and not state.get("final_answer"):
         final = f"ERROR: {error}"
+        source_type = "error"
+
+    # --- Insufficient RAG evidence ---
     elif insufficient and intent == "rag":
         final = (
             "INSUFFICIENT_EVIDENCE: The knowledge base does not contain enough relevant "
             "information to answer this question reliably. "
             "Do not interpret this as a statutory engineering decision."
         )
+        source_type = "local_rag"
+
+    # --- Code execution succeeded ---
     elif intent in ("code",) and reflect_decision == "done" and sandbox_stdout:
-        # LLM Synthesis for code
         try:
             switch_model("reasoning")
             prompt = (
-                "You are an expert engineering assistant. Summarize the following Python calculation "
-                "output into a clear engineering note. \n\n"
+                "Summarize the following Python calculation output into a clear engineering note. "
+                "Do NOT repeat the prompt or instructions. Just provide the summary.\n\n"
                 f"Output: {sandbox_stdout.strip()}"
             )
             resp = chat_completion(messages=[{"role": "user", "content": prompt}], max_tokens=300)
-            final = resp.get("content", f"Calculation result:\n{sandbox_stdout.strip()}")
+            final = _clean_llm_output(resp.get("content", f"Calculation result:\n{sandbox_stdout.strip()}"))
         except Exception as exc:
-            logger.error(f"LLM compilation failed: {exc}")
+            logger.error("LLM compilation failed: %s", exc)
             final = f"Calculation result:\n{sandbox_stdout.strip()}"
-            
+        source_type = "local_model"
+
+    # --- Code execution failed ---
     elif intent in ("code",) and reflect_decision == "fail":
         final = (
             "CODE_EXECUTION_FAILED: The calculation could not be completed after "
             f"{settings.agent_max_iterations} retries. "
             f"Last error: {(state.get('sandbox_stderr') or '')[:300]}"
         )
+        source_type = "local_model"
+
+    # --- Vision path ---
     elif intent == "vision":
-        status = state.get("vision_status", "VISION_UNAVAILABLE")
-        if status == "ok":
+        vs = state.get("vision_status", "VISION_UNAVAILABLE")
+        if vs == "ok":
             vision_text = state.get("vision_result") or ""
-            # LLM Synthesis for vision
             try:
                 switch_model("reasoning")
                 prompt = (
-                    "You are an expert engineering assistant. The vision model has extracted text "
-                    "from a P&ID diagram. Describe the instrumentation loops found in the text clearly.\n\n"
+                    "The vision model extracted the following from a P&ID diagram. "
+                    "Describe the instrumentation loops clearly. Do NOT repeat the prompt.\n\n"
                     f"Extracted Text: {vision_text}"
                 )
                 resp = chat_completion(messages=[{"role": "user", "content": prompt}], max_tokens=300)
-                final = resp.get("content", vision_text or "Vision analysis complete.")
+                final = _clean_llm_output(resp.get("content", vision_text or "Vision analysis complete."))
             except Exception as exc:
-                logger.error(f"LLM compilation failed: {exc}")
+                logger.error("LLM compilation failed: %s", exc)
                 final = vision_text or "Vision analysis complete (no text extracted)."
+            source_type = "uploaded_image"
+        elif vs == "VISION_NO_IMAGE":
+            final = (
+                "No image was attached to this request. To use vision analysis, "
+                "please provide an image path (e.g., a P&ID diagram in the data/ directory)."
+            )
+            source_type = "none"
         else:
             final = (
-                "VISION_UNAVAILABLE: The vision model is not loaded. "
-                "Download Qwen2.5-VL-3B GGUF + mmproj and run scripts/probe_vision.py to enable."
+                "VISION_UNAVAILABLE: The vision model could not be loaded. "
+                "Ensure Qwen2.5-VL-3B GGUF + mmproj files are present in models/ "
+                "and run scripts/probe_vision.py to verify."
             )
-    elif retrieved or state.get("query"):
-        # Real LLM Synthesis for RAG or unknown
-        query = state.get("query", "")
-        context_str = "\n\n".join(f"Document [{c.doc_id}]: {c.text}" for c in retrieved[:3])
+            source_type = "none"
+
+    # --- Code explanation (new intent) ---
+    elif intent == "code_explanation":
+        try:
+            switch_model("reasoning")
+            prompt = (
+                "Explain the following code clearly and concisely. "
+                "Describe what it does, any potential issues, and expected output. "
+                "Do NOT execute the code. Do NOT repeat the prompt.\n\n"
+                f"Code:\n{query}"
+            )
+            resp = chat_completion(messages=[{"role": "user", "content": prompt}], max_tokens=400)
+            final = _clean_llm_output(resp.get("content", "Unable to explain the code."))
+            final = f"**Code Explanation** (LOCAL_MODEL_EXPLANATION)\n\n{final}"
+        except Exception as exc:
+            logger.error("Code explanation failed: %s", exc)
+            final = "Unable to explain the code. The reasoning model may be unavailable."
+        source_type = "local_model"
+
+    # --- General question (not in corpus) ---
+    elif intent == "general_question":
+        try:
+            switch_model("reasoning")
+            prompt = (
+                "Answer the following question accurately and concisely. "
+                "You are a knowledgeable assistant. Do NOT repeat the prompt or instructions.\n\n"
+                f"Question: {query}"
+            )
+            resp = chat_completion(messages=[{"role": "user", "content": prompt}], max_tokens=400)
+            final = _clean_llm_output(resp.get("content", "Unable to answer."))
+            final = f"{final}\n\n*Note: This answer is from the local reasoning model (LOCAL_MODEL_NO_CORPUS_EVIDENCE). It is not grounded in the MRPL knowledge base.*"
+        except Exception as exc:
+            logger.error("General question failed: %s", exc)
+            final = "Unable to generate an answer. The reasoning model may be unavailable."
+        source_type = "local_model"
+
+    # --- PDF Question Answering ---
+    elif intent == "pdf_question" or (intent == "general_question" and state.get("uploaded_pdf_text")):
+        pdf_text = state.get("uploaded_pdf_text", "")
+        
+        # Context Budget Safety (Sub-Task C): limit to ~2500 tokens = ~10000 chars
+        MAX_CHARS = 10000
+        if len(pdf_text) > MAX_CHARS:
+            pdf_text = pdf_text[:MAX_CHARS] + "\n\n[...TEXT TRUNCATED DUE TO CONTEXT LIMIT...]"
+            state = _evt(state, "compile_result", "warning", warning="PDF_TRUNCATED_FOR_CONTEXT")
+            
         prompt = (
-            "You are the MRPL Sovereign AI Assistant. Answer the user question accurately and "
-            "concisely using the provided refinery documentation context. If the context does not "
-            "contain the answer, politely state that according to MRPL on-prem records, no specific "
-            "clause was found, but provide general guidance based on your knowledge.\n\n"
-            f"Context:\n{context_str}\n\n"
-            f"User Question: {query}"
+            "Answer the user question accurately using ONLY the provided PDF document text. "
+            "If the document does not contain the answer, state that clearly. "
+            "Do NOT repeat the prompt or instructions.\n\n"
+            f"PDF Document Text:\n{pdf_text}\n\n"
+            f"Question: {query}"
         )
         try:
             switch_model("reasoning")
             resp = chat_completion(messages=[{"role": "user", "content": prompt}], max_tokens=500)
-            final = resp.get("content", "Error synthesizing response.")
+            final = _clean_llm_output(resp.get("content", "Error analyzing PDF."))
+        except Exception as exc:
+            logger.error("LLM compilation failed: %s", exc)
+            final = "Error synthesizing response. Model may be unavailable."
+        source_type = "uploaded_pdf"
+
+    # --- RAG synthesis (default path for rag intent or when evidence exists) ---
+    elif intent == "rag" or (retrieved and not insufficient):
+        context_str = "\n\n".join(f"Document [{c.doc_id}]: {c.text}" for c in retrieved[:3])
+        prompt = (
+            "Answer the user question accurately and concisely using ONLY the provided "
+            "refinery documentation context. If the context does not contain the answer, "
+            "say so clearly. Do NOT repeat the prompt or instructions.\n\n"
+            f"Context:\n{context_str}\n\n"
+            f"Question: {query}"
+        )
+        try:
+            switch_model("reasoning")
+            resp = chat_completion(messages=[{"role": "user", "content": prompt}], max_tokens=500)
+            final = _clean_llm_output(resp.get("content", "Error synthesizing response."))
             if retrieved:
                 final += f"\n\n*Sources: {', '.join(set(c.doc_id for c in retrieved[:3]))}*"
         except Exception as exc:
-            logger.error(f"LLM compilation failed: {exc}")
+            logger.error("LLM compilation failed: %s", exc)
             final = "Error synthesizing response. Model may be unavailable."
-    else:
-        final = "No result produced. Check event log for details."
+        source_type = "local_rag"
 
-    state = {**state, "final_answer": final}
-    state = _evt(state, "compile_result", "exit", intent=intent, answer_len=len(final))
+    # --- Fallback for unknown with some evidence ---
+    elif retrieved:
+        context_str = "\n\n".join(f"Document [{c.doc_id}]: {c.text}" for c in retrieved[:3])
+        prompt = (
+            "Answer the following question using any relevant context provided. "
+            "If the context is not relevant, answer from general knowledge and note that. "
+            "Do NOT repeat the prompt.\n\n"
+            f"Context:\n{context_str}\n\n"
+            f"Question: {query}"
+        )
+        try:
+            switch_model("reasoning")
+            resp = chat_completion(messages=[{"role": "user", "content": prompt}], max_tokens=400)
+            final = _clean_llm_output(resp.get("content", "Unable to process request."))
+        except Exception as exc:
+            logger.error("LLM fallback failed: %s", exc)
+            final = "Unable to process request. Model may be unavailable."
+        source_type = "local_model"
+
+    else:
+        final = "No result produced. Please rephrase your question or provide more context."
+
+    state = {**state, "final_answer": final, "source_type": source_type}
+    state = _evt(state, "compile_result", "exit", intent=intent, answer_len=len(final), source_type=source_type)
     return state
 
 

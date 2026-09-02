@@ -119,6 +119,9 @@ def get_current_role() -> str | None:
     """Return currently active model role, or None if no model is running."""
     return _current_role
 
+def get_manager_state() -> dict:
+    return {"active_role": _current_role}
+
 
 def get_current_pid() -> int | None:
     return _current_pid

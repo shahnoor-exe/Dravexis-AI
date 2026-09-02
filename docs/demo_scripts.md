@@ -13,7 +13,8 @@
 .\scripts\start_all.ps1                     # starts llama-server + FastAPI (wait for READY)
 
 # In browser / Tauri window
-cd ui\mrpl-workbench && npm run tauri dev   # wait for desktop window
+cd ui\mrpl-workbench && npm run dev   # wait for dev server
+# Open browser at http://localhost:5173
 ```
 
 Verify in UI:

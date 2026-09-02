@@ -84,7 +84,7 @@ function ArtifactShelf({ onPreview }: { onPreview: (fileName: string) => void })
         evidence: lastResponse.retrieved_evidence,
         session_id: lastResponse.session_id,
         model_role: lastResponse.active_model,
-        label: lastResponse.status === "ok" ? "GROUNDED" : "INSUFFICIENT_EVIDENCE",
+        label: lastResponse.status === "completed" ? "GROUNDED" : "INSUFFICIENT_EVIDENCE",
         vision_status: visionStatus,
         sandbox_mode: sandboxMode,
       });
@@ -234,12 +234,12 @@ function NetworkMonitorCard() {
         </div>
 
         <div className="flex items-center gap-2 text-neon-emerald text-[10px] font-mono font-bold tracking-widest uppercase mb-3">
-          <span className={`w-2 h-2 rounded-full ${capabilities?.network?.status === 'MONITOR_UNAVAILABLE' ? 'bg-amber-500' : 'bg-neon-emerald animate-pulse'}`}></span>
-          {capabilities?.network?.status === "MONITOR_UNAVAILABLE" ? "EXTERNAL EGRESS: UNKNOWN" : "0 Bps EXTERNAL EGRESS"}
+          <span className={`w-2 h-2 rounded-full ${capabilities?.network?.error_code === 'MONITOR_UNAVAILABLE' ? 'bg-amber-500' : 'bg-neon-emerald animate-pulse'}`}></span>
+          {capabilities?.network?.error_code === "MONITOR_UNAVAILABLE" ? "EXTERNAL EGRESS: UNKNOWN" : "0 Bps EXTERNAL EGRESS"}
         </div>
         
-        <div className={`text-[9px] font-mono border px-2 py-1 rounded inline-block ${capabilities?.network?.status === 'MONITOR_UNAVAILABLE' ? 'text-amber-500/70 border-amber-500/20 bg-amber-500/10' : 'text-neon-emerald/70 border-neon-emerald/20 bg-neon-emerald/10'}`}>
-          {capabilities?.network?.status === "MONITOR_UNAVAILABLE" ? "PACKET CAPTURE UNAVAILABLE" : "AIR-GAPPABLE DESIGN — LOOPBACK ONLY"}
+        <div className={`text-[9px] font-mono border px-2 py-1 rounded inline-block ${capabilities?.network?.error_code === 'MONITOR_UNAVAILABLE' ? 'text-amber-500/70 border-amber-500/20 bg-amber-500/10' : 'text-neon-emerald/70 border-neon-emerald/20 bg-neon-emerald/10'}`}>
+          {capabilities?.network?.error_code === "MONITOR_UNAVAILABLE" ? "PACKET CAPTURE UNAVAILABLE" : "AIR-GAPPABLE DESIGN — LOOPBACK ONLY"}
         </div>
 
         {!summary ? (
@@ -263,8 +263,9 @@ import { Button } from "./ui/Button";
 
 export const RightRail: React.FC<{ width?: number }> = ({ width }) => {
   const { lastResponse, runStatus, visionStatus, sandboxMode, error } = useAgentStore();
-  const isRunning = runStatus === 'running';
+  const isRunning = ["validating", "routing", "retrieving", "loading_model", "generating", "awaiting_approval"].includes(runStatus);
   const [previewFile, setPreviewFile] = useState<string | null>(null);
+  const [showFullError, setShowFullError] = useState(false);
 
   return (
     <aside 
@@ -282,22 +283,45 @@ export const RightRail: React.FC<{ width?: number }> = ({ width }) => {
           </h3>
           <div className="flex flex-col gap-2 font-mono text-[10px]">
             {visionStatus === "VISION_UNAVAILABLE" && (
-              <div className="text-amber-200/80 border-l-2 border-neon-amber/50 pl-2">
+              <div className="text-amber-200/80 border-l-2 border-neon-amber/50 pl-2 break-words">
                 <span className="text-neon-amber font-bold">VISION:</span> UNAVAILABLE<br/>
                 VL model not loaded.
               </div>
             )}
             {sandboxMode === "DEGRADED_SANDBOX" && (
-              <div className="text-orange-300 border-l-2 border-orange-500/50 pl-2">
+              <div className="text-orange-300 border-l-2 border-orange-500/50 pl-2 break-words">
                 <span className="text-orange-400 font-bold">SANDBOX:</span> DEGRADED<br/>
                 AST allowlist only.
               </div>
             )}
             {error && (
-              <div className="text-red-300 border-l-2 border-red-500/50 pl-2">
-                <span className="text-red-400 font-bold">ERROR:</span> {error.slice(0, 100)}
+              <div className="text-red-300 border-l-2 border-red-500/50 pl-2" style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-red-400 font-bold">ERROR:</span>
+                  <button onClick={() => setShowFullError(true)} className="text-[8px] uppercase tracking-widest text-red-400 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 px-1 py-0.5 rounded">View Log</button>
+                </div>
+                <div className="line-clamp-3">
+                  {typeof error === "object" && error !== null ? (error as any).message : String(error)}
+                </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {showFullError && error && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-cyber-obsidian border border-red-500/50 rounded-sm p-6 max-w-3xl w-full max-h-[80vh] flex flex-col shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+            <div className="flex justify-between items-center mb-4 border-b border-zinc-800 pb-3">
+              <h3 className="text-red-400 font-mono text-sm tracking-widest uppercase flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                System Error Log {typeof error === "object" && error !== null ? `[${(error as any).code}]` : ""}
+              </h3>
+              <button onClick={() => setShowFullError(false)} className="text-zinc-500 hover:text-white">✕</button>
+            </div>
+            <div className="flex-1 overflow-y-auto bg-black/60 border border-zinc-800 p-4 font-mono text-xs text-red-200/80 rounded whitespace-pre-wrap" style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}>
+              {typeof error === "object" && error !== null ? JSON.stringify(error, null, 2).replace(/"(path|filepath|cwd|C:\\.*?)"/g, '"[REDACTED]"') : String(error).replace(/C:\\[^'"\s]+/g, "[REDACTED]")}
+            </div>
           </div>
         </div>
       )}

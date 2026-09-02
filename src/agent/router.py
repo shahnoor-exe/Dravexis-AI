@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 # Output schema                                                                #
 # --------------------------------------------------------------------------- #
 
-Intent = Literal["rag", "vision", "code", "system", "unknown"]
+Intent = Literal["rag", "vision", "code", "code_explanation", "general_question", "system", "unknown"]
 
 
 class RouterResult(BaseModel):
@@ -78,6 +78,18 @@ _REGEX_RULES: list[tuple[re.Pattern, RouterResult]] = [
         re.compile(r"\b(remaining\s+(life|service\s+life)|rl\s+calc)\b", re.I),
         RouterResult(intent="code", confidence=0.94, method="regex",
                      required_tools=["code_model", "sandbox"], requires_code=True),
+    ),
+    # --- Code explanation: detect code-like input ---
+    (
+        re.compile(r"\b(explain|describe|what\s+does)\b.*\b(code|script|function|snippet)\b", re.I),
+        RouterResult(intent="code_explanation", confidence=0.92, method="regex",
+                     required_tools=["reasoning_model"]),
+    ),
+    # --- Question-style queries about wall thickness/rules/standards → rag ---
+    (
+        re.compile(r"\b(what|which|how|when|where|why|is\s+there|do\s+we)\b.*\b(wall.?thickness|minimum|rule|standard|specification|requirement|code)\b", re.I),
+        RouterResult(intent="rag", confidence=0.90, method="regex",
+                     required_tools=["retrieval"]),
     ),
 ]
 
@@ -134,14 +146,43 @@ def _score_keywords(query: str) -> RouterResult:
 
     intent, conf, tools, vis, code = best
     if best_score < 0.25:
+        # No keyword match — check for code-like patterns
+        if _detect_code_input(query):
+            return RouterResult(
+                intent="code_explanation", confidence=0.75, method="keyword",
+                required_tools=["reasoning_model"], requires_vision=False, requires_code=False,
+            )
+        # Default to general_question instead of unknown
         return RouterResult(
-            intent="unknown", confidence=0.5, method="keyword",
-            required_tools=[], requires_vision=False, requires_code=False,
+            intent="general_question", confidence=0.5, method="keyword",
+            required_tools=["reasoning_model"], requires_vision=False, requires_code=False,
         )
     return RouterResult(
         intent=intent, confidence=round(conf, 3), method="keyword",
         required_tools=tools, requires_vision=vis, requires_code=code,
     )
+
+
+def _detect_code_input(query: str) -> bool:
+    """Heuristic: does the query contain code-like patterns?"""
+    code_patterns = [
+        r'\bdef\s+\w+\s*\(',       # function definition
+        r'\bimport\s+\w+',         # import statement
+        r'\bprint\s*\(',           # print call
+        r'\bclass\s+\w+',          # class definition
+        r'\bfor\s+\w+\s+in\s+',    # for loop
+        r'\bif\s+.*:',             # if statement
+        r'\breturn\s+',            # return statement
+        r'\w+\s*=\s*[\[\{\(]',     # assignment with collection
+    ]
+    for pattern in code_patterns:
+        if re.search(pattern, query):
+            return True
+    # Check for indentation (multiple lines with leading spaces)
+    lines = query.strip().split('\n')
+    if len(lines) >= 2 and any(line.startswith('    ') or line.startswith('\t') for line in lines[1:]):
+        return True
+    return False
 
 
 # --------------------------------------------------------------------------- #

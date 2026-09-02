@@ -35,7 +35,7 @@ _APPROVED_WORKSPACE = BASE_DIR / "data"
 
 
 class AgentRunRequest(BaseModel):
-    query: str = Field(..., min_length=1, max_length=4096)
+    query: str = Field("", max_length=4096)
     session_id: str | None = None
     image_path: str | None = None          # local path, validated to data/ root
     intent_override: str | None = None    # test-only; never bypasses tool safety
@@ -68,19 +68,27 @@ class AgentRunRequest(BaseModel):
 
 
 class AgentRunResponse(BaseModel):
+    run_id: str
     session_id: str
-    status: str                        # "ok" | "error" | "partial"
+    status: str                        # "idle"|"validating"|"routing"|"retrieving"|"loading_model"|"generating"|"awaiting_approval"|"completed"|"partial"|"failed"|"disconnected"|"cancelled"
+    success: bool
     intent: str
+    model_role: str | None
+    model_status: str | None
+    answer: str | None
+    error: dict | str | None           # structured error dict or string message
+    warnings: list[str]
+    events: list[dict]
+    latency_ms: float
+    
+    # Legacy / UI fields
     confidence: float
     method: str
-    events: list[dict]
-    retrieved_evidence: list[dict]     # {doc_id, score, text_preview}
+    retrieved_evidence: list[dict]
     vision_status: str
     code_status: str
     sandbox_mode: str
     iteration: int
-    final_answer: str | None
-    error: str | None
     active_model: str | None
     model_switch_latency_ms: float | None
     total_latency_ms: float
@@ -100,6 +108,7 @@ async def agent_run(req: AgentRunRequest) -> AgentRunResponse:
     """
     session_id = req.session_id or str(uuid.uuid4())
     t_start = time.monotonic()
+    unix_start_ts = time.time()
 
     logger.info("Agent run: session=%s query=%r", session_id, req.query[:80])
 
@@ -110,6 +119,33 @@ async def agent_run(req: AgentRunRequest) -> AgentRunResponse:
         image_path=req.image_path,
         intent_override=req.intent_override,
     )
+
+    if not req.query.strip() and not req.image_path:
+        return AgentRunResponse(
+            run_id=session_id,
+            session_id=session_id,
+            status="partial",
+            success=False,
+            intent="unknown",
+            model_role=None,
+            model_status=None,
+            answer="Please ask a question or provide input.",
+            error={"code": "EMPTY_INPUT", "message": "Input was empty."},
+            warnings=[],
+            events=[],
+            latency_ms=round((time.monotonic() - t_start) * 1000, 1),
+            # Legacy
+            confidence=0.0,
+            method="",
+            retrieved_evidence=[],
+            vision_status="not_requested",
+            code_status="not_requested",
+            sandbox_mode="not_run",
+            iteration=0,
+            active_model=None,
+            model_switch_latency_ms=None,
+            total_latency_ms=round((time.monotonic() - t_start) * 1000, 1),
+        )
 
     # Run the graph (synchronous; wrap in executor for FastAPI async context)
     import asyncio
@@ -127,20 +163,40 @@ async def agent_run(req: AgentRunRequest) -> AgentRunResponse:
     except Exception as exc:
         logger.error("Graph invocation failed: %s", exc, exc_info=True)
         total_ms = (time.monotonic() - t_start) * 1000
+        
+        # Determine if it's a connection error based on string matching since exc could be nested
+        exc_str = str(exc)
+        if "LLAMA_SERVER_UNREACHABLE" in exc_str or "Connection lost" in exc_str:
+            err_obj = {"code": "LLAMA_SERVER_UNREACHABLE", "message": exc_str}
+            run_status = "disconnected"
+        elif "MODEL_SWITCH_FAILED" in exc_str:
+            err_obj = {"code": "MODEL_SWITCH_FAILED", "message": exc_str}
+            run_status = "failed"
+        else:
+            err_obj = {"code": "INTERNAL_ERROR", "message": exc_str}
+            run_status = "failed"
+            
         return AgentRunResponse(
+            run_id=session_id,
             session_id=session_id,
-            status="error",
+            status=run_status,
+            success=False,
             intent="unknown",
+            model_role=None,
+            model_status="error",
+            answer=None,
+            error=err_obj,
+            warnings=[],
+            events=[],
+            latency_ms=round(total_ms, 1),
+            # Legacy
             confidence=0.0,
             method="",
-            events=[],
             retrieved_evidence=[],
             vision_status="not_requested",
             code_status="not_requested",
             sandbox_mode="not_run",
             iteration=0,
-            final_answer=None,
-            error=str(exc),
             active_model=None,
             model_switch_latency_ms=None,
             total_latency_ms=round(total_ms, 1),
@@ -159,26 +215,53 @@ async def agent_run(req: AgentRunRequest) -> AgentRunResponse:
         for c in (final_state.get("retrieved_chunks") or [])
     ]
 
-    run_status = "ok"
+    run_status = "completed"
+    err_obj = None
     if final_state.get("error") and not final_state.get("final_answer"):
-        run_status = "error"
+        err_msg = str(final_state.get("error"))
+        if "LLAMA_SERVER_UNREACHABLE" in err_msg or "Connection lost" in err_msg:
+            run_status = "disconnected"
+            err_obj = {"code": "LLAMA_SERVER_UNREACHABLE", "message": err_msg}
+        elif "MODEL_SWITCH_FAILED" in err_msg:
+            run_status = "failed"
+            err_obj = {"code": "MODEL_SWITCH_FAILED", "message": err_msg}
+        elif "VISION_UNAVAILABLE" in err_msg or "vision_model_error" in err_msg:
+            run_status = "failed"
+            err_obj = {"code": "VISION_UNAVAILABLE", "message": err_msg}
+        else:
+            run_status = "failed"
+            err_obj = {"code": "INTERNAL_ERROR", "message": err_msg}
     elif final_state.get("insufficient_evidence"):
         run_status = "partial"
 
+    # Filter events to only return those generated during this request (prevent duplication across multi-turn)
+    current_events = [e for e in final_state.get("events", []) if e.get("ts", 0) >= unix_start_ts]
+    
+    # Add run_id to events for frontend deduplication
+    for e in current_events:
+        e["run_id"] = session_id
+
     return AgentRunResponse(
+        run_id=session_id,
         session_id=session_id,
         status=run_status,
+        success=run_status in ("completed", "partial"),
         intent=final_state.get("intent", "unknown"),
+        model_role=final_state.get("active_model_role"),
+        model_status="loaded" if final_state.get("active_model_role") else None,
+        answer=final_state.get("final_answer"),
+        error=err_obj,
+        warnings=[],
+        events=current_events,
+        latency_ms=round(total_ms, 1),
+        # Legacy
         confidence=final_state.get("confidence", 0.0),
         method=final_state.get("method", ""),
-        events=final_state.get("events", []),
         retrieved_evidence=evidence,
         vision_status=final_state.get("vision_status", "not_requested"),
         code_status=final_state.get("code_status", "not_requested"),
         sandbox_mode=final_state.get("sandbox_mode", "not_run"),
         iteration=final_state.get("iteration", 0),
-        final_answer=final_state.get("final_answer"),
-        error=final_state.get("error"),
         active_model=final_state.get("active_model_role"),
         model_switch_latency_ms=final_state.get("model_switch_latency_ms"),
         total_latency_ms=round(total_ms, 1),

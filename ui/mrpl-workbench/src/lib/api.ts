@@ -25,19 +25,27 @@ export type AgentEvent = {
 };
 
 export type AgentRunResponse = {
+  run_id: string;
   session_id: string;
-  status: "ok" | "error" | "partial";
+  status: "idle" | "validating" | "routing" | "retrieving" | "loading_model" | "generating" | "awaiting_approval" | "completed" | "partial" | "failed" | "disconnected" | "cancelled";
+  success: boolean;
   intent: string;
+  model_role: string | null;
+  model_status: string | null;
+  answer: string | null;
+  error: { code: string; message: string } | string | null;
+  warnings: string[];
+  events: AgentEvent[];
+  latency_ms: number;
+  
+  // Legacy / existing fields
   confidence: number;
   method: string;
-  events: AgentEvent[];
   retrieved_evidence: EvidenceChunk[];
   vision_status: string;
   code_status: string;
   sandbox_mode: string;
   iteration: number;
-  final_answer: string | null;
-  error: string | null;
   active_model: string | null;
   model_switch_latency_ms: number | null;
   total_latency_ms: number;
@@ -71,6 +79,29 @@ export type NetworkSummary = {
   service_health: Record<string, string>;
   packet_capture: string;
   timestamp_utc: number;
+};
+
+export type CapabilityDetail = {
+  status: "available" | "unavailable" | "degraded" | "error" | "unknown";
+  display_name: string;
+  model: string;
+  last_checked: string;
+  error_code: string | null;
+  error_message: string | null;
+  action: string | null;
+  evidence: string | null;
+  loaded?: boolean;
+  probe_ok?: boolean;
+  mode?: string;
+};
+
+export type Capabilities = {
+  reasoning: CapabilityDetail;
+  vision: CapabilityDetail;
+  coder: CapabilityDetail;
+  gpu: CapabilityDetail;
+  sandbox: CapabilityDetail;
+  network: CapabilityDetail;
 };
 
 async function _fetch<T>(url: string, options?: RequestInit): Promise<T> {
@@ -115,4 +146,6 @@ export const api = {
   networkSummary: () => _fetch<NetworkSummary>(API.networkMonitorSummary),
 
   networkMonitor: () => _fetch<Record<string, unknown>>(API.networkMonitor),
+
+  capabilities: () => _fetch<Capabilities>(`${API.health}capabilities`),
 };

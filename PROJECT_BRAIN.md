@@ -917,3 +917,84 @@ COMPLETE — REHEARSED WITH LIMITATIONS; LOCAL RELEASE READY; GITHUB PUSH COMPLE
   11. Memory manager with deletion control.
   12. Payload inspector redacting sensitive tokens.
   13. Passing final test matrix for advanced UX features.
+
+### Session Log
+### Branding and Repository Maintenance (Dravexis AI) completed — 2026-09-02T18:10:00+05:30
+- **Product renamed to**: Dravexis AI.
+- **Files changed**: `README.md`, `launch_dravexis.bat`, `scripts/start_all.ps1`, `scripts/airgap_rehearsal.ps1`, `docs/jury_limitations.md`, `docs/final_demo_runbook.md`, `src/main.py`, `src/artifact_compiler/*.py`, `ui/mrpl-workbench/src/components/TopBar.tsx`, `ui/mrpl-workbench/src/components/PreviewPane.tsx`, `ui/mrpl-workbench/src-tauri/tauri.conf.json`.
+- **User-facing locations updated**: Terminal window titles, echo statements, README titles, FastAPI OpenAPI title, generation disclaimers, Tauri desktop titles, React UI TopBar.
+- **Technical references preserved**: 
+  - `launch_dravexis.bat` filename (preserved to maintain runbook commands).
+  - `ui/mrpl-workbench/package.json` package name `mrpl-workbench` (internal metadata).
+  - `tauri.conf.json` bundle identifier `com.mrpl.aiworkbench` (internal metadata).
+  - `App.tsx` local storage keys `dravexis-left-width`/`dravexis-right-width` (internal metadata).
+  - `historyStore.ts` local storage key `dravexis-history-storage` (internal metadata).
+- **Historical references preserved**: All historical entries within `PROJECT_BRAIN.md` were intentionally preserved.
+- **Current branch**: `main`
+- **Old repository name**: `Dravexis-On-Prem-Agentic-Control-Layer`
+- **New repository name**: `Dravexis-AI` (Successfully changed via `gh repo rename`)
+- **Old remote URL**: `https://github.com/shahnoor-exe/Dravexis-On-Prem-Agentic-Control-Layer.git`
+- **New remote URL**: `https://github.com/shahnoor-exe/Dravexis-AI.git`
+- **Commit hash**: `e221a54`
+- **Push result**: SUCCESS (pushed to origin/main).
+- **Validation commands**: `python -m pytest tests/test_artifact_compilers.py`, `python -m pytest`, `cd ui/mrpl-workbench && npm run build`.
+- **Validation results**: All 77 backend tests passed. UI compiled successfully.
+- **Confirmation**: Application functionality was NOT intentionally changed. All tests assert logic safely.
+- **Unresolved old references**: Only intentionally preserved internal variables/state keys remain.
+- **Exact next action**: Await final user directive or demo start.
+
+### Reliability, UX, and Live State Fixes Started — 2026-09-02T18:15:00+05:30
+- **Files Read**: `src/main.py`, `src/agent/graph.py`, `src/routers/agent.py`, `src/model_manager.py`, `ui/mrpl-workbench/src/components/LeftRail.tsx`.
+- **Current Commit**: `e221a54` (main)
+- **Actual URLs**: Backend `127.0.0.1:8000`, UI `localhost:5173`.
+- **Runtime Processes**: `llama-server` running, `uvicorn` backend running.
+- **Reproduced Contradictions**: 
+  - `LeftRail` shows VISION READY due to cached probe, but runtime fails to load model and errors out. 
+  - Model switch process restarts sever active HTTP connections yielding `WinError 10054`. 
+  - Frontend shows "EXECUTION SUCCESS" despite backend errors due to missing authoritative state handling.
+- **Current Capability Response**: Unstructured JSON mapped to internal flags.
+- **Task Scope**: Fix live execution-state synchronization, model capability contradictions, connection-error handling, log truncation, and degraded-service UX.
+- **Acceptance Gates**: Optical sensor status never contradicts live vision; failed request never shows success; raw errors mapped to actionable UI controls; full logs readable and redacted; trace events deduplicated by run_id; degraded services clearly explained; truth matrix passes.
+
+### Landing Page Implementation Started — 2026-09-02T19:28:00+05:30
+- **Files read**: `ui/mrpl-workbench/src/App.tsx`, `ui/mrpl-workbench/src/hooks/useBackendHealth.ts`, `ui/mrpl-workbench/src/store/settingsStore.ts`, `docs/jury_limitations.md`, `PROJECT_BRAIN.md`
+- **Current commit**: `e221a5409b8fc77e87ea54ccfac31b7571866726` (main)
+- **Actual URLs**: Vite `http://localhost:5173`, API `http://127.0.0.1:8000`
+- **Existing frontend entry path**: `ui/mrpl-workbench/src/App.tsx` controls the main layout with `TopBar`, `LeftRail`, `CenterStage`, and `RightRail`.
+- **Landing-page scope**: Build a first, eye-catching, responsive landing page loaded before the workbench. Must feature a GSAP-animated entry, a live capability strip, an interactive mission preview, a limitations panel, and an "Initialize Workbench" transition that preserves state without dual-initializations.
+- **Existing capability limitations**:
+  - CPU_FALLBACK / Partial GPU Offload.
+  - DEGRADED_SANDBOX (AST-allowlist only, no Docker).
+  - MONITOR_UNAVAILABLE or psutil process-level telemetry only.
+  - 17-vector demo corpus.
+  - Vision model loading constraints.
+- **Acceptance gates**:
+  - Dravexis AI branding & truthful positioning.
+  - GSAP animations clean up properly, supporting reduced-motion.
+  - Initialize Workbench transitions seamlessly into existing components.
+  - Backend-unavailable error is actionable.
+  - Capability badges accurately consume `GET /capabilities`.
+  - Responsive down to 1366x768.
+  - Validation script & frontend tests pass.
+
+### Landing Page Implementation Completed — 2026-09-02T19:36:00+05:30
+- **Status**: COMPLETE
+- **Product branding status**: "Dravexis AI" and "Sovereign Industrial Intelligence" properly displayed. Honest limitations shown.
+- **GSAP animation sequence**: Landing page animated cleanly with opacity & transform. Core breathes, sweeps animate. Respects reduced-motion preference. Transition to workbench animates out then seamlessly initializes `App.tsx` state.
+- **Capability polling behavior**: Consumes real API `GET /capabilities` for system live status.
+- **Workbench transition behavior**: `hasInitialized` and `skipIntro` local storage integration ensures the workbench is only fully booted up and animated when the user selects "Initialize Workbench".
+- **Validation matrix**: 20/20 Gates PASSED.
+- **Files changed**:
+  - `ui/mrpl-workbench/src/App.tsx`
+  - `ui/mrpl-workbench/src/index.css`
+  - `ui/mrpl-workbench/src/components/LandingPage.tsx`
+  - `ui/mrpl-workbench/src/store/settingsStore.ts`
+  - `ui/mrpl-workbench/src/components/CenterStage.tsx`
+  - `ui/mrpl-workbench/src/components/LeftRail.tsx`
+  - `ui/mrpl-workbench/src/components/RightRail.tsx`
+  - `ui/mrpl-workbench/src/hooks/useAgentRun.ts`
+  - `scripts/dravexis_ai_landing_validation.py`
+  - `data/dravexis_ai_landing_validation.json`
+- **Documentation changes**: Updated `PROJECT_BRAIN.md` and created `walkthrough.md` in artifacts.
+- **Remaining limitations**: Same runtime limitations apply (No Docker, limited GPU VRAM, 17-vector corpus).
+- **Exact next action**: Commit changes to Git and push to remote.

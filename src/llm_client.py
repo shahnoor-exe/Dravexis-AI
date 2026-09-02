@@ -58,9 +58,9 @@ class LlamaClient:
         try:
             resp = await self._client.post("/completion", json=payload)
             resp.raise_for_status()
-        except httpx.ConnectError as exc:
+        except (httpx.ConnectError, httpx.ReadError, httpx.RemoteProtocolError) as exc:
             raise LlamaServerError(
-                f"Cannot connect to llama-server at {settings.llama_server_url}. "
+                f"Cannot connect to llama-server at {settings.llama_server_url} (Connection dropped). "
                 "Is start_llama_server.ps1 running?"
             ) from exc
         except httpx.TimeoutException as exc:
@@ -147,6 +147,12 @@ def chat_completion(
             "content": data.get("content", "").strip(),
             "tokens": data.get("tokens_predicted", -1),
         }
+    except (httpx.ConnectError, httpx.ReadError, httpx.RemoteProtocolError) as exc:
+        raise LlamaServerError(f"LLAMA_SERVER_UNREACHABLE: Connection lost or server crashed ({exc})") from exc
+    except httpx.TimeoutException as exc:
+        raise LlamaServerError("LLAMA_SERVER_TIMEOUT: Model did not respond in time") from exc
+    except httpx.HTTPStatusError as exc:
+        raise LlamaServerError(f"LLAMA_SERVER_HTTP_ERROR: {exc.response.status_code}") from exc
     except Exception as exc:
         raise LlamaServerError(f"chat_completion failed: {exc}") from exc
 
@@ -178,5 +184,11 @@ def vision_completion(image_path: str, prompt: str, max_tokens: int = 512) -> di
         resp.raise_for_status()
         data = resp.json()
         return {"content": data.get("content", "").strip()}
+    except (httpx.ConnectError, httpx.ReadError, httpx.RemoteProtocolError) as exc:
+        raise LlamaServerError(f"LLAMA_SERVER_UNREACHABLE: Connection lost or server crashed ({exc})") from exc
+    except httpx.TimeoutException as exc:
+        raise LlamaServerError("LLAMA_SERVER_TIMEOUT: Model did not respond in time") from exc
+    except httpx.HTTPStatusError as exc:
+        raise LlamaServerError(f"LLAMA_SERVER_HTTP_ERROR: {exc.response.status_code}") from exc
     except Exception as exc:
         raise LlamaServerError(f"vision_completion failed: {exc}") from exc

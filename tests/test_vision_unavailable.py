@@ -60,7 +60,7 @@ class TestVisionNodeFallback:
             state = make_initial_state(
                 query="analyse this P&ID",
                 session_id="test-vision-001",
-                image_path=None,
+                image_path="data/dummy_test_image.png",
             )
             state["requires_vision"] = True
 

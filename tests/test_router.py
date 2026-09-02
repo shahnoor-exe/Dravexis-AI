@@ -62,7 +62,7 @@ class TestKeywordFallback:
     def test_unknown_query(self):
         result = route("tell me a joke about a refinery engineer")
         # Should be unknown or rag with low confidence — must NOT fabricate statutory answer
-        assert result.intent in ("unknown", "rag")
+        assert result.intent in ("unknown", "rag", "general_question")
 
     def test_empty_query(self):
         result = route("")
