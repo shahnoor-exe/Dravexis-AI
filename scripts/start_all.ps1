@@ -52,9 +52,9 @@ if (-not $models) {
 
 # --- Check if FastAPI is already running ---
 try {
-    $check = Invoke-WebRequest -Uri "http://127.0.0.1:8000/" -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop
-    Write-Host "[OK] FastAPI already running at http://127.0.0.1:8000 -- nothing to do." -ForegroundColor Green
-    Write-Host "     Docs: http://127.0.0.1:8000/docs" -ForegroundColor Gray
+    $check = Invoke-WebRequest -Uri "http://127.0.0.1:8080/" -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop
+    Write-Host "[OK] FastAPI already running at http://127.0.0.1:8080 -- nothing to do." -ForegroundColor Green
+    Write-Host "     Docs: http://127.0.0.1:8080/docs" -ForegroundColor Gray
     Write-Host ""
     Write-Host "Press Ctrl+C to exit this status window." -ForegroundColor DarkGray
     while ($true) { Start-Sleep -Seconds 60 }
@@ -63,7 +63,7 @@ try {
 
 # --- Start FastAPI gateway directly (not hidden) ---
 Write-Host ""
-Write-Host "[1/1] Starting FastAPI gateway on port 8000..." -ForegroundColor Yellow
+Write-Host "[1/1] Starting FastAPI gateway on port 8080..." -ForegroundColor Yellow
 Write-Host "      llama-server will be started automatically by model_manager" -ForegroundColor Gray
 Write-Host "      when the first agent query arrives." -ForegroundColor Gray
 Write-Host ""
@@ -75,4 +75,4 @@ Set-Location $ProjectRoot
 
 # Run uvicorn in the FOREGROUND so this terminal shows live logs
 # (The launcher already spawned this in a separate titled cmd window)
-python -m uvicorn src.main:app --host 127.0.0.1 --port 8000
+python -m uvicorn src.main:app --host 127.0.0.1 --port 8080

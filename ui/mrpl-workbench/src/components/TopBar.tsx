@@ -83,7 +83,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleHistory }) => {
         <div className="hidden 2xl:flex items-center gap-2 border border-neon-cyan/20 bg-neon-cyan/5 px-2 py-1 rounded">
           <span className="text-neon-cyan text-[8px] font-mono font-bold tracking-widest uppercase">UI:5173</span>
           <span className="w-1 h-1 rounded-full bg-neon-cyan/30"></span>
-          <span className="text-zinc-400 text-[8px] font-mono tracking-widest uppercase">API:8000</span>
+          <span className="text-zinc-400 text-[8px] font-mono tracking-widest uppercase">API:8080</span>
           <span className="w-1 h-1 rounded-full bg-zinc-700"></span>
           <span className="text-zinc-500 text-[8px] font-mono tracking-widest uppercase">{import.meta.env.MODE === 'development' ? 'DEV' : 'PROD'}</span>
         </div>
@@ -113,7 +113,7 @@ export const TopBar: React.FC<TopBarProps> = ({ onToggleHistory }) => {
           
           <div className="flex flex-col items-end border-l border-zinc-800/80 pl-4 ml-2">
             <div className="text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-1">Telemetry Loopback</div>
-            <div className="text-zinc-300 text-xs font-mono">127.0.0.1:8000</div>
+            <div className="text-zinc-300 text-xs font-mono">127.0.0.1:8080</div>
           </div>
           <CapabilityBadge label="API" status={connectionStatus} compact />
           

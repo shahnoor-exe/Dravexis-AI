@@ -57,7 +57,7 @@ Review thoroughly before finalizing.
 
       <div className="p-3 border-t border-zinc-800/80 bg-black/50 flex justify-between items-center">
         <span className="text-[9px] text-zinc-500 font-mono uppercase tracking-widest">{fileName}</span>
-        <Button variant="ghost" size="sm" onClick={() => window.open(`http://127.0.0.1:8000/artifacts/download/${encodeURIComponent(fileName)}`, "_blank")}>
+        <Button variant="ghost" size="sm" onClick={() => window.open(`http://127.0.0.1:8080/artifacts/download/${encodeURIComponent(fileName)}`, "_blank")}>
           Download Full
         </Button>
       </div>

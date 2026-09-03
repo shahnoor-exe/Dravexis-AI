@@ -148,7 +148,7 @@ function ArtifactShelf({ onPreview }: { onPreview: (fileName: string) => void })
                   r.status === "ok" ? (
                     <div className="mt-2 flex items-center justify-between gap-2" onClick={(e) => e.stopPropagation()}>
                       <a
-                        href={`http://127.0.0.1:8000/artifacts/download/${encodeURIComponent(r.file_name ?? "")}`}
+                        href={`http://127.0.0.1:8080/artifacts/download/${encodeURIComponent(r.file_name ?? "")}`}
                         target="_blank"
                         rel="noreferrer"
                         className="text-[10px] text-neon-emerald hover:underline truncate font-mono inline-block flex-1"

@@ -76,7 +76,7 @@ export const CenterStage: React.FC = () => {
       formData.append("file", file);
 
       if (file.type === "application/pdf") {
-        const res = await fetch("http://127.0.0.1:8000/upload/pdf", {
+        const res = await fetch("http://127.0.0.1:8080/upload/pdf", {
           method: "POST",
           body: formData,
         });
@@ -98,7 +98,7 @@ export const CenterStage: React.FC = () => {
           setAttachedFileName(`Error: ${data.final_answer}`);
         }
       } else if (file.type.startsWith("image/")) {
-        const res = await fetch("http://127.0.0.1:8000/upload/image", {
+        const res = await fetch("http://127.0.0.1:8080/upload/image", {
           method: "POST",
           body: formData,
         });

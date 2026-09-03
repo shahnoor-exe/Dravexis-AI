@@ -1,7 +1,7 @@
 // lib/constants.ts — Single source of truth for all backend endpoints.
 // NEVER let user input become an arbitrary URL. All calls go through api.ts only.
 
-export const BACKEND_URL = "http://127.0.0.1:8000" as const;
+export const BACKEND_URL = "http://127.0.0.1:8080" as const;
 export const LLAMA_URL = "http://127.0.0.1:8080" as const;
 
 export const API = {

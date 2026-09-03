@@ -63,36 +63,36 @@ if "!FOUND_GGUF!"=="0" (
 )
 echo [OK] GGUF model(s) found in models\
 
-:: --- 6. Aggressively clean up zombie processes on Port 8000 ---
+:: --- 6. Aggressively clean up zombie processes on Port 8080 ---
 echo.
-echo [Check] Checking for zombie processes on Port 8000...
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr "0.0.0.0:8000"') do (
+echo [Check] Checking for zombie processes on Port 8080...
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr "0.0.0.0:8080"') do (
     if not "%%a"=="0" (
-        echo [WARN] Port 8000 is occupied by PID %%a. Killing zombie process...
+        echo [WARN] Port 8080 is occupied by PID %%a. Killing zombie process...
         taskkill /F /PID %%a >nul 2>&1
         timeout /t 1 /nobreak >nul
     )
 )
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr "127.0.0.1:8000"') do (
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr "127.0.0.1:8080"') do (
     if not "%%a"=="0" (
-        echo [WARN] Port 8000 is occupied by PID %%a. Killing zombie process...
+        echo [WARN] Port 8080 is occupied by PID %%a. Killing zombie process...
         taskkill /F /PID %%a >nul 2>&1
         timeout /t 1 /nobreak >nul
     )
 )
-echo [OK] Port 8000 is clean.
+echo [OK] Port 8080 is clean.
 
 :: --- 7. Start FastAPI backend in its own titled window ---
 echo [1/2] Launching FastAPI Backend Gateway...
 echo       (llama-server will spawn automatically on first agent query)
-start "Dravexis AI Backend Gateway" cmd /k "cd /d ""%ROOT%"" && set ""PYTHONUTF8=1"" && python -m uvicorn src.main:app --host 127.0.0.1 --port 8000"
+start "Dravexis AI Backend Gateway" cmd /k "cd /d ""%ROOT%"" && set ""PYTHONUTF8=1"" && python -m uvicorn src.main:app --host 127.0.0.1 --port 8080"
 
 :: --- 8. Poll FastAPI health (max 15s — should be ready in ~2-3s) ---
 echo       Waiting for FastAPI to be ready (max 15s)...
 set "READY=0"
 for /L %%i in (1,1,15) do (
     if "!READY!"=="0" (
-        powershell -NoProfile -Command "try { $null = Invoke-WebRequest -Uri 'http://127.0.0.1:8000/' -UseBasicParsing -TimeoutSec 1 -EA Stop; Write-Host 'OK' } catch { Write-Host 'WAIT' }" > "%TEMP%\drav_h.tmp" 2>&1
+        powershell -NoProfile -Command "try { $null = Invoke-WebRequest -Uri 'http://127.0.0.1:8080/' -UseBasicParsing -TimeoutSec 1 -EA Stop; Write-Host 'OK' } catch { Write-Host 'WAIT' }" > "%TEMP%\drav_h.tmp" 2>&1
         set /p HS=<"%TEMP%\drav_h.tmp"
         del "%TEMP%\drav_h.tmp" 2>nul
         if "!HS!"=="OK" set "READY=1"
@@ -107,7 +107,7 @@ if "!READY!"=="0" (
     echo         Check the "Dravexis AI Backend Gateway" terminal window for errors.
     goto :FAIL
 )
-echo [OK] FastAPI ready at http://127.0.0.1:8000
+echo [OK] FastAPI ready at http://127.0.0.1:8080
 
 :LAUNCH_UI
 if "!NO_UI!"=="1" (
@@ -121,7 +121,7 @@ if not exist "%ROOT%\ui\mrpl-workbench\package.json" (
 
 :: --- 9. Start Vite dev server in its own window ---
 echo.
-echo [2/2] Launching Vite Web Server (npm run dev, port 1420)...
+echo [2/2] Launching Vite Web Server (npm run dev, port 5173)...
 start "Dravexis AI Web Server" cmd /k "cd /d ""%ROOT%\ui\mrpl-workbench"" && npm run dev"
 
 echo       Waiting 3s for Vite to bind...
@@ -129,16 +129,16 @@ timeout /t 3 /nobreak >nul
 
 :: --- 10. Auto-open default browser ---
 echo       Opening default browser...
-start http://localhost:1420/
+start http://localhost:5173/
 
 :DONE
 echo.
 echo =====================================================================
 echo  Dravexis AI is running!
 echo.
-echo   FastAPI Backend  : http://127.0.0.1:8000
-echo   API Docs         : http://127.0.0.1:8000/docs
-echo   Web App (Browser): http://localhost:1420/
+echo   FastAPI Backend  : http://127.0.0.1:8080
+echo   API Docs         : http://127.0.0.1:8080/docs
+echo   Web App (Browser): http://localhost:5173/
 echo.
 echo  [Note] First query will trigger on-demand model load (~2-3s).
 echo  [Info] For native Tauri desktop shell (needs Rust/cargo):
