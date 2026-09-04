@@ -710,6 +710,8 @@ COMPLETE — REHEARSED WITH LIMITATIONS; LOCAL RELEASE READY; GITHUB PUSH COMPLE
   - Implemented `DemoMode.tsx` providing a standalone interactive matrix for presentation.
   - Features real-time typing simulations, network packet trace animations, and static JSON data bypasses for offline presentation reliability.
   - Easily toggled via the `/demo` endpoint or the new UI button.
+- **Launcher Hardening**:
+  - Replaced brittle `Invoke-WebRequest` in `launch_dravexis.bat` with a robust, non-fatal `curl.exe` backend polling mechanism. Prevents false-positive aborts from stalling the UI boot sequence.
 - **GitHub Push**: Changes clean, verified, and committed to repository.
 
 ### Live LLM Synthesis & Cyberpunk Overhaul Polish — 2026-09-02
