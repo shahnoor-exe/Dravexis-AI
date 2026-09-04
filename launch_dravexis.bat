@@ -87,27 +87,26 @@ echo [1/2] Launching FastAPI Backend Gateway...
 echo       (llama-server will spawn automatically on first agent query)
 start "Dravexis AI Backend Gateway" cmd /k "cd /d ""%ROOT%"" && set ""PYTHONUTF8=1"" && python -m uvicorn src.main:app --host 127.0.0.1 --port 8080"
 
-:: --- 8. Poll FastAPI health (max 15s — should be ready in ~2-3s) ---
-echo       Waiting for FastAPI to be ready (max 15s)...
+:: --- 8. Wait for FastAPI to bind (Simple delay + optional curl) ---
+echo       Waiting up to 10s for FastAPI to bind...
 set "READY=0"
-for /L %%i in (1,1,15) do (
+for /L %%i in (1,1,10) do (
     if "!READY!"=="0" (
-        powershell -NoProfile -Command "try { $null = Invoke-WebRequest -Uri 'http://127.0.0.1:8080/' -UseBasicParsing -TimeoutSec 1 -EA Stop; Write-Host 'OK' } catch { Write-Host 'WAIT' }" > "%TEMP%\drav_h.tmp" 2>&1
-        set /p HS=<"%TEMP%\drav_h.tmp"
-        del "%TEMP%\drav_h.tmp" 2>nul
-        if "!HS!"=="OK" set "READY=1"
-        if "!READY!"=="0" (
+        curl.exe -s http://127.0.0.1:8080/ >nul 2>&1
+        if !errorlevel! equ 0 (
+            set "READY=1"
+        ) else (
             timeout /t 1 /nobreak >nul
         )
     )
 )
 
 if "!READY!"=="0" (
-    echo [ERROR] FastAPI did not respond within 15s.
-    echo         Check the "Dravexis AI Backend Gateway" terminal window for errors.
-    goto :FAIL
+    echo [WARN] FastAPI health check timed out or curl unavailable.
+    echo        Proceeding to launch UI anyway. Check the Backend terminal if API fails.
+) else (
+    echo [OK] FastAPI ready at http://127.0.0.1:8080
 )
-echo [OK] FastAPI ready at http://127.0.0.1:8080
 
 :LAUNCH_UI
 if "!NO_UI!"=="1" (
