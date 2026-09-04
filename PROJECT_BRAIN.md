@@ -1031,3 +1031,37 @@ COMPLETE — REHEARSED WITH LIMITATIONS; LOCAL RELEASE READY; GITHUB PUSH COMPLE
 - **Documentation changes**: Updated `PROJECT_BRAIN.md` and created `walkthrough.md` in artifacts.
 - **Remaining limitations**: Same runtime limitations apply (No Docker, limited GPU VRAM, 17-vector corpus).
 - **Exact next action**: Commit changes to Git and push to remote.
+
+---
+
+### Session — Dark/Light Mode & Error UX Fixes — 2026-09-04T16:33:00+05:30
+
+#### Problems Identified & Root Causes
+1. **"Failed to fetch" Error Loop**: When the FastAPI backend was not running, `useAgentRun` caught the browser `TypeError: Failed to fetch` and passed the raw string to `failRun()`, which displayed a jarring red "SYSTEM EXCEPTION / Failed to fetch" crash panel.
+2. **Tailwind v4 `@theme` Missing**: Custom color tokens (`bg-cyber-obsidian`, `text-neon-cyan` etc.) were defined in CSS vars only. Tailwind v4 requires explicit `@theme` block to generate utility classes. Without it, all custom-color utilities silently failed across the entire UI.
+3. **`WorkbenchLayout` Hardcoded Dark Classes**: `App.tsx` WorkbenchLayout had `bg-cyber-obsidian text-zinc-100` hardcoded — ignoring the theme system's CSS variables entirely, so Light mode was invisible/non-functional in the workbench.
+4. **Capabilities URL Double-slash Bug**: `api.capabilities()` used `${API.health}capabilities` = `http://127.0.0.1:8080//capabilities` (note double slash). This caused 404 responses for every capabilities poll.
+5. **Health Check Mismatch**: `useBackendHealth.ts` checked `health?.status === "running"` but backend root returns `{ service: "Dravexis AI", status: "running", ... }` — both fields were present but the timeout was too long, causing false DISCONNECTED states.
+6. **Landing Page Error Buttons**: `LandingPage.tsx` showed "LOCAL RUNTIME UNAVAILABLE" / "Retry Connection" red buttons whenever `connectionStatus === "DISCONNECTED"`, even though the app works fine in Demo Mode without the backend.
+
+#### Fixes Applied
+| File | Fix |
+|------|-----|
+| `src/index.css` | Added `@theme {}` block mapping all CSS vars to Tailwind v4 utility tokens |
+| `src/App.tsx` | Changed WorkbenchLayout root div to `bg-cyber-bg text-text-main transition-colors duration-400` |
+| `src/lib/constants.ts` | Added `capabilities` field to `API` object: `${BACKEND_URL}/capabilities` |
+| `src/lib/api.ts` | Fixed `api.capabilities()` to use `API.capabilities`; added `AbortSignal.timeout(4000)` to health check |
+| `src/hooks/useBackendHealth.ts` | Added `health?.service === "Dravexis AI"` as fallback CONNECTED condition |
+| `src/store/agentStore.ts` | `failRun()` now detects "Failed to fetch" / network errors and maps them to `{ code: "BACKEND_OFFLINE", message: "..." }` with `runStatus: "disconnected"` |
+| `src/components/CenterStage.tsx` | Error block now shows a calm "Backend Offline" message for `BACKEND_OFFLINE` vs the red crash box for real LLM/system exceptions |
+| `src/components/LandingPage.tsx` | Removed all connection-status-gated error buttons; `INITIALIZE WORKBENCH` always shown; `ThemeToggle` added top-right |
+
+#### Verification
+- ✅ `npm run build` passes cleanly (255 modules, 0 TS errors)
+- ✅ Dark mode verified in Chrome: Obsidian canvas, neon cyan/amber/emerald accents fully visible
+- ✅ Light mode verified in Chrome: Clean industrial slate background, readable text
+- ✅ Theme toggle (moon/sun) visible on both Landing Page and Workbench TopBar
+- ✅ Landing page: No error buttons, "INITIALIZE WORKBENCH" always shows
+- ✅ Backend offline state: Shows calm "Backend Offline" message with Dismiss/Retry, no red crash
+- ✅ Pushed to GitHub: commit `d8c9143`
+
