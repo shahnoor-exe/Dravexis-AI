@@ -3,6 +3,18 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  --color-cyber-bg: var(--cyber-bg);
+  --color-cyber-obsidian: var(--cyber-obsidian);
+  --color-slate-glass: var(--slate-glass);
+  --color-neon-cyan: var(--neon-cyan);
+  --color-neon-magenta: var(--neon-magenta);
+  --color-neon-emerald: var(--neon-emerald);
+  --color-neon-amber: var(--neon-amber);
+  --color-muted-steel: var(--muted-steel);
+  --color-text-main: var(--text-main);
+}
+
 :root {
   /* LIGHT MODE - Clean Industrial Cleanroom */
   color-scheme: light;
