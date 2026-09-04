@@ -1,7 +1,28 @@
 /* index.css — Cyberpunk industrial control theme */
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
+  /* LIGHT MODE - Clean Industrial Cleanroom */
+  color-scheme: light;
+  --cyber-bg: #F3F5F9;
+  --cyber-obsidian: #E8ECF2;
+  --slate-glass: rgba(255, 255, 255, 0.78);
+  --neon-cyan: #0066FF; /* Electric Cobalt Blue */
+  --neon-magenta: #0D9488; /* Industrial Teal */
+  --neon-emerald: #059669; /* Emerald */
+  --neon-amber: #D97706; /* Safety Amber */
+  --muted-steel: #64748B;
+  --text-main: #0F172A;
+  
+  /* Scrollbar override */
+  --scrollbar-track: #E2E8F0;
+  --scrollbar-thumb: #CBD5E1;
+}
+
+:root.dark {
+  /* DARK MODE - Obsidian Control Room */
   color-scheme: dark;
   --cyber-bg: #070A0F;
   --cyber-obsidian: #070A0F;
@@ -11,20 +32,26 @@
   --neon-emerald: #38E6A5;
   --neon-amber: #FFB547;
   --muted-steel: #718096;
+  --text-main: #f4f4f5;
+
+  /* Scrollbar override */
+  --scrollbar-track: #070A0F;
+  --scrollbar-thumb: #3f3f46;
 }
 
 html, body, #root {
   height: 100%;
   overflow: hidden;
   background: var(--cyber-bg);
-  color: #f4f4f5;
+  color: var(--text-main);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--cyber-obsidian); }
-::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); transition: background-color 0.4s ease; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; transition: background-color 0.4s ease; }
 ::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
 
 textarea { font-family: inherit; }

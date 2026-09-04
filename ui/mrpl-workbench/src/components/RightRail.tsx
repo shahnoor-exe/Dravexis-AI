@@ -33,14 +33,14 @@ function AuditTrace() {
 
   return (
     <div className="relative z-10">
-      <h3 className="text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-3 flex items-center gap-2">
+      <h3 className="text-slate-500 dark:text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-3 flex items-center gap-2 transition-colors duration-400">
         <svg className="w-3 h-3 text-neon-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
         Execution Trace
       </h3>
       {events.length === 0 ? (
-        <div className="text-zinc-700 text-xs font-mono">System standing by...</div>
+        <div className="text-slate-500 dark:text-zinc-700 text-xs font-mono transition-colors duration-400">System standing by...</div>
       ) : (
-        <div ref={traceRef} className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-2 bg-slate-glass/50 p-3 rounded-sm border border-zinc-800/80 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
+        <div ref={traceRef} className="flex flex-col gap-1.5 max-h-48 overflow-y-auto pr-2 bg-white/80 dark:bg-slate-glass/50 p-3 rounded-sm border border-slate-200 dark:border-zinc-800/80 shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_10px_rgba(0,0,0,0.5)] transition-colors duration-400">
           {collapsedEvents.map((ev, i) => (
             <div
               key={i}
@@ -51,7 +51,7 @@ function AuditTrace() {
                 "text-zinc-400"
               }`}
             >
-              <span className="text-zinc-600 shrink-0 font-bold">{String(i + 1).padStart(2, "0")}</span>
+              <span className="text-slate-500 dark:text-zinc-600 shrink-0 font-bold">{String(i + 1).padStart(2, "0")}</span>
               <span className="shrink-0">{ev.status === "running" ? "▶" : "■"}</span>
               <span className="flex-1">{ev.name}</span>
               {ev.status !== "running" && <span className="opacity-70 text-[8px] uppercase">{ev.status}</span>}
@@ -120,12 +120,12 @@ function ArtifactShelf({ onPreview }: { onPreview: (fileName: string) => void })
 
   return (
     <div className="relative z-10">
-      <h3 className="text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-3 flex items-center gap-2">
+      <h3 className="text-slate-500 dark:text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-3 flex items-center gap-2 transition-colors duration-400">
         <svg className="w-3 h-3 text-neon-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /></svg>
         Artifact Matrix
       </h3>
       {!lastResponse ? (
-        <div className="text-zinc-700 text-xs font-mono">Awaiting execution data...</div>
+        <div className="text-slate-500 dark:text-zinc-700 text-xs font-mono transition-colors duration-400">Awaiting execution data...</div>
       ) : (
         <div className="grid grid-cols-1 gap-3" style={{ perspective: "1000px" }}>
           {types.map(({ id, label, icon, color }) => {
@@ -135,12 +135,12 @@ function ArtifactShelf({ onPreview }: { onPreview: (fileName: string) => void })
                 key={id}
                 onClick={(e) => handleCardClick(e, id)}
                 disabled={!!generating}
-                className="relative w-full bg-slate-glass/50 border border-zinc-700/80 rounded-sm p-3 text-left transition-all duration-300 hover:border-neon-cyan hover:shadow-[0_0_15px_rgba(32,227,255,0.2)] disabled:opacity-50 disabled:cursor-not-allowed group"
+                className="relative w-full bg-white/80 dark:bg-slate-glass/50 border border-slate-200 dark:border-zinc-700/80 rounded-sm p-3 text-left transition-all duration-300 hover:border-neon-cyan hover:shadow-sm dark:hover:shadow-[0_0_15px_rgba(32,227,255,0.2)] shadow-sm dark:shadow-none disabled:opacity-50 disabled:cursor-not-allowed group"
                 style={{ transformStyle: "preserve-3d" }}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className={`text-xs font-bold tracking-wide ${color.split(' ')[0]}`}>{icon} {label}</span>
-                  <span className="text-[9px] font-mono uppercase tracking-widest text-zinc-500 border border-zinc-700 px-1.5 py-0.5 rounded bg-black">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-slate-500 dark:text-zinc-500 border border-slate-300 dark:border-zinc-700 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-black transition-colors duration-400">
                     {generating === id ? "COMPILING" : r?.status === "ok" ? "READY" : id.toUpperCase()}
                   </span>
                 </div>
@@ -160,10 +160,10 @@ function ArtifactShelf({ onPreview }: { onPreview: (fileName: string) => void })
                       </Button>
                     </div>
                   ) : (
-                    <div className="text-[10px] text-red-400 font-mono mt-1 break-all">✗ {r.error}</div>
+                    <div className="text-[10px] text-red-600 dark:text-red-400 font-mono mt-1 break-all">✗ {r.error}</div>
                   )
                 ) : (
-                  <div className="text-[9px] text-zinc-600 font-mono mt-1">Click to Generate locally...</div>
+                  <div className="text-[9px] text-slate-400 dark:text-zinc-600 font-mono mt-1 transition-colors duration-400">Click to Generate locally...</div>
                 )}
               </button>
             );
@@ -209,13 +209,13 @@ function NetworkMonitorCard() {
 
   return (
     <div className="relative z-10">
-      <h3 className="text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-3 flex items-center gap-2">
+      <h3 className="text-slate-500 dark:text-zinc-500 text-[10px] font-mono uppercase tracking-widest mb-3 flex items-center gap-2 transition-colors duration-400">
         <svg className="w-3 h-3 text-neon-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" /></svg>
         Network Egress Sensor
       </h3>
       
-      <div className="bg-slate-glass/50 border border-neon-emerald/30 rounded-sm p-4 relative overflow-hidden group">
-        <div className="absolute inset-0 bg-neon-emerald/5 mix-blend-overlay"></div>
+      <div className="bg-white/80 dark:bg-slate-glass/50 border border-emerald-300 dark:border-neon-emerald/30 rounded-sm p-4 relative overflow-hidden group shadow-sm dark:shadow-none transition-colors duration-400">
+        <div className="absolute inset-0 bg-emerald-50 dark:bg-neon-emerald/5 mix-blend-overlay"></div>
         
         {/* Real-time SVG Waveform */}
         <div className="h-10 mb-3 flex items-end justify-between px-2">
@@ -238,17 +238,17 @@ function NetworkMonitorCard() {
           {capabilities?.network?.error_code === "MONITOR_UNAVAILABLE" ? "EXTERNAL EGRESS: UNKNOWN" : "0 Bps EXTERNAL EGRESS"}
         </div>
         
-        <div className={`text-[9px] font-mono border px-2 py-1 rounded inline-block ${capabilities?.network?.error_code === 'MONITOR_UNAVAILABLE' ? 'text-amber-500/70 border-amber-500/20 bg-amber-500/10' : 'text-neon-emerald/70 border-neon-emerald/20 bg-neon-emerald/10'}`}>
+        <div className={`text-[9px] font-mono border px-2 py-1 rounded inline-block transition-colors duration-400 ${capabilities?.network?.error_code === 'MONITOR_UNAVAILABLE' ? 'text-amber-700 dark:text-amber-500/70 border-amber-300 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-500/10' : 'text-emerald-700 dark:text-neon-emerald/70 border-emerald-300 dark:border-neon-emerald/20 bg-emerald-50 dark:bg-neon-emerald/10'}`}>
           {capabilities?.network?.error_code === "MONITOR_UNAVAILABLE" ? "PACKET CAPTURE UNAVAILABLE" : "AIR-GAPPABLE DESIGN — LOOPBACK ONLY"}
         </div>
 
         {!summary ? (
-          <div className="text-zinc-700 text-[10px] font-mono mt-3">Polling...</div>
+          <div className="text-slate-500 dark:text-zinc-700 text-[10px] font-mono mt-3 transition-colors duration-400">Polling...</div>
         ) : (
-          <div className="mt-4 pt-3 border-t border-neon-emerald/10 text-[9px] font-mono text-zinc-500">
+          <div className="mt-4 pt-3 border-t border-emerald-200 dark:border-neon-emerald/10 text-[9px] font-mono text-slate-500 dark:text-zinc-500 transition-colors duration-400">
             <div>Capture: {String(summary.packet_capture ?? "UNKNOWN")}</div>
             <div>Monitor: {String(summary.monitor_capability ?? "UNKNOWN")}</div>
-            <div className="truncate mt-1 text-zinc-400" title={String(summary.egress_note ?? "UNKNOWN")}>
+            <div className="truncate mt-1 text-slate-400 dark:text-zinc-400" title={String(summary.egress_note ?? "UNKNOWN")}>
               {String(summary.egress_note ?? "UNKNOWN")}
             </div>
           </div>
@@ -270,13 +270,13 @@ export const RightRail: React.FC<{ width?: number }> = ({ width }) => {
   return (
     <aside 
       style={{ width: width ? `${width}px` : undefined }}
-      className="right-rail flex flex-col gap-4 w-80 min-w-[20rem] max-w-[50vw] p-4 bg-cyber-obsidian border-l border-zinc-800/80 overflow-y-auto relative z-0 shadow-[-4px_0_24px_rgba(0,0,0,0.3)] shrink-0 transition-[width] duration-75"
+      className="right-rail flex flex-col gap-4 w-80 min-w-[20rem] max-w-[50vw] p-4 bg-slate-50 dark:bg-cyber-obsidian border-l border-slate-200 dark:border-zinc-800/80 overflow-y-auto relative z-0 shadow-sm dark:shadow-[-4px_0_24px_rgba(0,0,0,0.3)] shrink-0 transition-all duration-400"
     >
-      <div className="absolute inset-0 scanlines opacity-15 mix-blend-overlay pointer-events-none"></div>
+      <div className="absolute inset-0 scanlines opacity-5 dark:opacity-15 mix-blend-overlay pointer-events-none transition-opacity duration-400"></div>
       
       {/* Capability warnings - only show genuine runtime errors */}
       {error && (
-        <div className="bg-slate-glass/50 border border-neon-amber/30 rounded-sm p-4 relative z-10">
+        <div className="bg-white/80 dark:bg-slate-glass/50 border border-amber-300 dark:border-neon-amber/30 rounded-sm p-4 relative z-10 transition-colors duration-400">
           <h3 className="text-neon-amber text-[10px] font-mono font-bold tracking-widest uppercase mb-3 flex items-center gap-2">
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
             System Warnings
@@ -315,8 +315,8 @@ export const RightRail: React.FC<{ width?: number }> = ({ width }) => {
       )}
 
       <AuditTrace />
-      <div className="border-t border-zinc-800/80 pt-5"><ArtifactShelf onPreview={setPreviewFile} /></div>
-      <div className="border-t border-zinc-800/80 pt-5 flex-1"><NetworkMonitorCard /></div>
+      <div className="border-t border-slate-200 dark:border-zinc-800/80 pt-5 transition-colors duration-400"><ArtifactShelf onPreview={setPreviewFile} /></div>
+      <div className="border-t border-slate-200 dark:border-zinc-800/80 pt-5 flex-1 transition-colors duration-400"><NetworkMonitorCard /></div>
 
       <PreviewPane fileName={previewFile} onClose={() => setPreviewFile(null)} />
     </aside>

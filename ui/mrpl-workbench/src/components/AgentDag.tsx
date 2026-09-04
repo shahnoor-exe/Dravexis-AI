@@ -10,14 +10,14 @@ import "reactflow/dist/style.css";
 import { useAgentStore } from "../store/agentStore";
 import type { NodeState } from "../lib/constants";
 
-// Node state → visual style with Cyberpunk aesthetic
-const NODE_STYLES: Record<NodeState, React.CSSProperties> = {
-  idle: { background: "rgba(18, 25, 38, 0.8)", border: "1px solid rgba(113, 128, 150, 0.5)", color: "#718096", backdropFilter: "blur(4px)" },
-  active: { background: "rgba(32, 227, 255, 0.1)", border: "1px solid rgba(32, 227, 255, 0.8)", color: "#20E3FF", animation: "pulse 1s infinite", boxShadow: "0 0 20px #20E3FF", backdropFilter: "blur(4px)", fontWeight: "bold" },
-  success: { background: "rgba(56, 230, 165, 0.1)", border: "1px solid rgba(56, 230, 165, 0.8)", color: "#38E6A5", boxShadow: "0 0 10px #38E6A5", backdropFilter: "blur(4px)" },
-  skipped: { background: "rgba(18, 25, 38, 0.8)", border: "1px dashed rgba(113, 128, 150, 0.5)", color: "#718096", backdropFilter: "blur(4px)" },
-  unavailable: { background: "rgba(255, 181, 71, 0.1)", border: "1px solid rgba(255, 181, 71, 0.5)", color: "#FFB547", backdropFilter: "blur(4px)" },
-  error: { background: "rgba(255, 62, 165, 0.1)", border: "1px solid rgba(255, 62, 165, 0.8)", color: "#FF3EA5", boxShadow: "0 0 15px rgba(255, 62, 165, 0.4)", backdropFilter: "blur(4px)" },
+// Node state → visual style with Cyberpunk aesthetic (Tailwind)
+const NODE_CLASSES: Record<NodeState, string> = {
+  idle: "bg-slate-50/90 dark:bg-[#121926]/80 border border-slate-300 dark:border-slate-500/50 text-slate-500 dark:text-slate-400 backdrop-blur-sm shadow-sm dark:shadow-none",
+  active: "bg-cyan-50/90 dark:bg-[#20e3ff]/10 border border-cyan-400 dark:border-[#20e3ff]/80 text-cyan-600 dark:text-[#20e3ff] font-bold backdrop-blur-sm shadow-[0_0_15px_rgba(32,227,255,0.3)] animate-pulse",
+  success: "bg-emerald-50/90 dark:bg-[#38e6a5]/10 border border-emerald-400 dark:border-[#38e6a5]/80 text-emerald-600 dark:text-[#38e6a5] backdrop-blur-sm shadow-sm dark:shadow-[0_0_10px_rgba(56,230,165,0.2)]",
+  skipped: "bg-slate-50/90 dark:bg-[#121926]/80 border border-dashed border-slate-300 dark:border-slate-500/50 text-slate-500 dark:text-slate-400 backdrop-blur-sm shadow-sm dark:shadow-none",
+  unavailable: "bg-amber-50/90 dark:bg-[#ffb547]/10 border border-amber-400 dark:border-[#ffb547]/50 text-amber-600 dark:text-[#ffb547] backdrop-blur-sm shadow-sm dark:shadow-none",
+  error: "bg-pink-50/90 dark:bg-[#ff3ea5]/10 border border-pink-400 dark:border-[#ff3ea5]/80 text-pink-600 dark:text-[#ff3ea5] backdrop-blur-sm shadow-[0_0_15px_rgba(255,62,165,0.3)]",
 };
 
 const NODE_LABELS: Record<string, string> = {
@@ -57,7 +57,7 @@ export const AgentDag: React.FC<{ onNodeSelect?: (nodeId: string) => void }> = (
   const nodes = useMemo(() =>
     DAG_NODES.map((n) => ({
       ...n,
-      style: { ...NODE_STYLES[nodeStates[n.id] ?? "idle"], borderRadius: 2, padding: "8px 14px", fontSize: 11, fontFamily: "monospace", textTransform: "uppercase", letterSpacing: "0.05em", minWidth: 130, textAlign: "center" as const, transition: "all 0.3s ease" },
+      className: `${NODE_CLASSES[nodeStates[n.id] ?? "idle"]} rounded-sm px-3.5 py-2 text-[11px] font-mono uppercase tracking-[0.05em] min-w-[130px] text-center transition-all duration-300`,
     })),
     [nodeStates]
   );
@@ -75,8 +75,8 @@ export const AgentDag: React.FC<{ onNodeSelect?: (nodeId: string) => void }> = (
   );
 
   return (
-    <div style={{ height: 500, background: "rgba(7, 10, 15, 0.5)", borderRadius: 2, border: "1px solid rgba(113, 128, 150, 0.2)", overflow: "hidden", position: "relative" }}>
-      <div className="absolute inset-0 scanlines opacity-30 mix-blend-overlay pointer-events-none"></div>
+    <div className="h-[500px] bg-slate-50 dark:bg-[#070a0f]/50 rounded-sm border border-slate-200 dark:border-slate-500/20 overflow-hidden relative transition-colors duration-400">
+      <div className="absolute inset-0 scanlines opacity-5 dark:opacity-30 mix-blend-overlay pointer-events-none transition-opacity duration-400"></div>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -93,7 +93,7 @@ export const AgentDag: React.FC<{ onNodeSelect?: (nodeId: string) => void }> = (
       </ReactFlow>
       {/* Vision status label */}
       {visionStatus === "VISION_UNAVAILABLE" && (
-        <div className="absolute bottom-0 w-full text-[9px] text-neon-amber font-mono text-center py-1.5 bg-black/80 border-t border-neon-amber/20 z-10 backdrop-blur-md uppercase tracking-widest">
+        <div className="absolute bottom-0 w-full text-[9px] text-amber-700 dark:text-neon-amber font-mono text-center py-1.5 bg-amber-50/90 dark:bg-black/80 border-t border-amber-300 dark:border-neon-amber/20 z-10 backdrop-blur-md uppercase tracking-widest transition-colors duration-400">
           ⚠ Vision Sensor Offline
         </div>
       )}

@@ -14,11 +14,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles: Record<ButtonVariant, string> = {
-  primary: 'bg-neon-cyan/20 border-neon-cyan text-neon-cyan hover:bg-neon-cyan/30 glow-cyan',
-  secondary: 'bg-black/50 border-zinc-700 text-zinc-300 hover:text-neon-cyan hover:border-neon-cyan/50 hover:bg-neon-cyan/10',
-  ghost: 'bg-transparent border-transparent text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50',
-  destructive: 'bg-red-950/40 border-red-500/50 text-red-400 hover:bg-red-900/50 hover:border-red-500 hover:text-red-300',
-  icon: 'bg-transparent border-transparent text-zinc-500 hover:text-neon-cyan hover:bg-zinc-800/50 p-1.5'
+  primary: 'bg-neon-cyan/10 dark:bg-neon-cyan/20 border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20 dark:hover:bg-neon-cyan/30 glow-cyan transition-colors duration-400',
+  secondary: 'bg-slate-100 dark:bg-black/50 border-slate-300 dark:border-zinc-700 text-slate-700 dark:text-zinc-300 hover:text-neon-cyan hover:border-neon-cyan/50 hover:bg-neon-cyan/10 transition-colors duration-400',
+  ghost: 'bg-transparent border-transparent text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200 hover:bg-slate-200 dark:hover:bg-zinc-800/50 transition-colors duration-400',
+  destructive: 'bg-red-50 dark:bg-red-950/40 border-red-300 dark:border-red-500/50 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/50 hover:border-red-400 dark:hover:border-red-500 hover:text-red-700 dark:hover:text-red-300 transition-colors duration-400',
+  icon: 'bg-transparent border-transparent text-slate-500 dark:text-zinc-500 hover:text-neon-cyan hover:bg-slate-200 dark:hover:bg-zinc-800/50 p-1.5 transition-colors duration-400'
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -46,7 +46,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     const baseClasses = 'inline-flex items-center justify-center font-mono uppercase tracking-widest transition-all duration-300 rounded-sm border focus:outline-none focus:ring-1 focus:ring-neon-cyan/50';
     const activeDisabled = disabled || isLoading;
-    const disabledClasses = activeDisabled ? 'opacity-50 cursor-not-allowed shadow-none hover:bg-transparent hover:border-zinc-700 hover:text-zinc-500' : 'cursor-pointer';
+    const disabledClasses = activeDisabled ? 'opacity-50 cursor-not-allowed shadow-none hover:bg-transparent hover:border-slate-300 dark:hover:border-zinc-700 hover:text-slate-400 dark:hover:text-zinc-500' : 'cursor-pointer';
     const widthClass = fullWidth ? 'w-full' : '';
 
     return (

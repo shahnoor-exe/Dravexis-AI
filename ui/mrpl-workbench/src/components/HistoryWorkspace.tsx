@@ -48,10 +48,10 @@ export const HistoryWorkspace: React.FC<Props> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="absolute inset-y-0 right-0 w-80 bg-cyber-obsidian border-l border-zinc-800/80 shadow-[0_0_40px_rgba(0,0,0,0.8)] z-[100] flex flex-col transform transition-transform duration-300">
+    <div className="absolute inset-y-0 right-0 w-80 bg-slate-50 dark:bg-cyber-obsidian border-l border-slate-200 dark:border-zinc-800/80 shadow-[-10px_0_40px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(0,0,0,0.8)] z-[100] flex flex-col transform transition-transform duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-zinc-800/80 bg-slate-glass/30 backdrop-blur-md">
-        <h2 className="text-zinc-300 text-[10px] font-mono uppercase tracking-[0.2em] flex items-center gap-2">
+      <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-zinc-800/80 bg-white/50 dark:bg-slate-glass/30 backdrop-blur-md transition-colors duration-400">
+        <h2 className="text-slate-600 dark:text-zinc-300 text-[10px] font-mono uppercase tracking-[0.2em] flex items-center gap-2 transition-colors duration-400">
           <svg className="w-4 h-4 text-neon-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           Local History
         </h2>
@@ -66,13 +66,13 @@ export const HistoryWorkspace: React.FC<Props> = ({ isOpen, onClose }) => {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-zinc-800/80 bg-zinc-950/80">
+      <div className="flex border-b border-slate-200 dark:border-zinc-800/80 bg-slate-100 dark:bg-zinc-950/80 transition-colors duration-400">
         {(['sessions', 'artifacts', 'media', 'memories'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2 text-[9px] font-mono uppercase tracking-widest border-b-2 transition-colors ${
-              activeTab === tab ? 'border-neon-cyan text-neon-cyan bg-neon-cyan/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900'
+              activeTab === tab ? 'border-neon-cyan text-neon-cyan bg-neon-cyan/5' : 'border-transparent text-slate-500 dark:text-zinc-500 hover:text-slate-700 dark:hover:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-900'
             }`}
           >
             {tab}
@@ -84,34 +84,34 @@ export const HistoryWorkspace: React.FC<Props> = ({ isOpen, onClose }) => {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {activeTab === 'sessions' && (
           treeSessions.length === 0 ? (
-            <div className="text-zinc-600 text-[10px] font-mono text-center mt-10">No local sessions found.</div>
+            <div className="text-slate-500 dark:text-zinc-600 text-[10px] font-mono text-center mt-10 transition-colors duration-400">No local sessions found.</div>
           ) : (
             treeSessions.map(s => (
               <div 
                 key={s.id} 
-                className="bg-black/40 border border-zinc-800 rounded p-3 group hover:border-neon-cyan/30 transition-colors relative"
+                className="bg-white dark:bg-black/40 border border-slate-200 dark:border-zinc-800 rounded p-3 group hover:border-neon-cyan/50 dark:hover:border-neon-cyan/30 transition-colors relative shadow-sm dark:shadow-none"
                 style={{ marginLeft: `${Math.min(s.depth * 16, 64)}px` }}
               >
                 {s.depth > 0 && (
-                  <div className="absolute top-1/2 -left-3 w-3 border-t border-zinc-700"></div>
+                  <div className="absolute top-1/2 -left-3 w-3 border-t border-slate-300 dark:border-zinc-700 transition-colors duration-400"></div>
                 )}
                 {s.depth > 0 && (
-                  <div className="absolute -top-3 -left-3 h-full border-l border-zinc-700"></div>
+                  <div className="absolute -top-3 -left-3 h-full border-l border-slate-300 dark:border-zinc-700 transition-colors duration-400"></div>
                 )}
                 <div className="flex justify-between items-start mb-2 relative z-10">
                   <span className="text-neon-cyan text-[9px] font-mono bg-neon-cyan/10 px-1.5 py-0.5 rounded uppercase">{s.intent || 'AUTO'}</span>
                   <div className="flex gap-2">
-                    <button onClick={() => handleFork(s)} className="text-zinc-500 hover:text-neon-amber transition-colors flex items-center gap-1 text-[9px] uppercase tracking-widest" title="Fork from this step">
+                    <button onClick={() => handleFork(s)} className="text-slate-500 dark:text-zinc-500 hover:text-neon-amber transition-colors flex items-center gap-1 text-[9px] uppercase tracking-widest" title="Fork from this step">
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7v8a2 2 0 002 2h6M8 7l-2 2m2-2l2 2M16 17l-2-2m2 2l2-2" /></svg>
                       Fork
                     </button>
-                    <button onClick={() => deleteSession(s.id)} className="text-zinc-600 hover:text-red-400 transition-colors">
+                    <button onClick={() => deleteSession(s.id)} className="text-slate-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400 transition-colors">
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                   </div>
                 </div>
-                <div className="text-zinc-300 text-[11px] font-mono line-clamp-2 mb-2">{s.query}</div>
-                <div className="text-zinc-500 text-[9px] font-mono flex justify-between">
+                <div className="text-slate-700 dark:text-zinc-300 text-[11px] font-mono line-clamp-2 mb-2 transition-colors duration-400">{s.query}</div>
+                <div className="text-slate-400 dark:text-zinc-500 text-[9px] font-mono flex justify-between transition-colors duration-400">
                   <span>{new Date(s.timestamp).toLocaleTimeString()}</span>
                   <span>{(s.latencyMs / 1000).toFixed(1)}s</span>
                 </div>
@@ -121,24 +121,24 @@ export const HistoryWorkspace: React.FC<Props> = ({ isOpen, onClose }) => {
         )}
         {activeTab === 'artifacts' && (
           artifacts.length === 0 ? (
-            <div className="text-zinc-600 text-[10px] font-mono text-center mt-10">No generated artifacts.</div>
+            <div className="text-slate-500 dark:text-zinc-600 text-[10px] font-mono text-center mt-10 transition-colors duration-400">No generated artifacts.</div>
           ) : (
             artifacts.map(a => (
-              <div key={a.id} className="bg-black/40 border border-zinc-800 rounded p-3">
+              <div key={a.id} className="bg-white dark:bg-black/40 border border-slate-200 dark:border-zinc-800 rounded p-3 shadow-sm dark:shadow-none transition-colors duration-400">
                 <div className="text-neon-magenta text-[10px] font-mono mb-1">{a.fileName}</div>
-                <div className="text-zinc-500 text-[9px] font-mono">{new Date(a.timestamp).toLocaleDateString()}</div>
+                <div className="text-slate-400 dark:text-zinc-500 text-[9px] font-mono transition-colors duration-400">{new Date(a.timestamp).toLocaleDateString()}</div>
               </div>
             ))
           )
         )}
         {activeTab === 'media' && (
           media.length === 0 ? (
-            <div className="text-zinc-600 text-[10px] font-mono text-center mt-10">No uploaded media.</div>
+            <div className="text-slate-500 dark:text-zinc-600 text-[10px] font-mono text-center mt-10 transition-colors duration-400">No uploaded media.</div>
           ) : (
             media.map(m => (
-              <div key={m.id} className="bg-black/40 border border-zinc-800 rounded p-3">
-                <div className="text-neon-amber text-[10px] font-mono mb-1 truncate">{m.originalName}</div>
-                <div className="text-zinc-500 text-[9px] font-mono uppercase">{m.type} • {(m.sizeBytes / 1024).toFixed(0)} KB</div>
+              <div key={m.id} className="bg-white dark:bg-black/40 border border-slate-200 dark:border-zinc-800 rounded p-3 shadow-sm dark:shadow-none transition-colors duration-400">
+                <div className="text-amber-600 dark:text-neon-amber text-[10px] font-mono mb-1 truncate transition-colors duration-400">{m.originalName}</div>
+                <div className="text-slate-400 dark:text-zinc-500 text-[9px] font-mono uppercase transition-colors duration-400">{m.type} • {(m.sizeBytes / 1024).toFixed(0)} KB</div>
               </div>
             ))
           )
@@ -146,25 +146,25 @@ export const HistoryWorkspace: React.FC<Props> = ({ isOpen, onClose }) => {
         {activeTab === 'memories' && (
           <div className="flex flex-col h-full">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-[10px] text-zinc-400 font-mono uppercase tracking-widest">Global Memory Store</span>
+              <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-mono uppercase tracking-widest transition-colors duration-400">Global Memory Store</span>
               {memories.length > 0 && (
-                <Button variant="ghost" size="sm" onClick={clearMemories} className="text-red-400 hover:text-red-300">
+                <Button variant="ghost" size="sm" onClick={clearMemories} className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300">
                   Clear All
                 </Button>
               )}
             </div>
             {memories.length === 0 ? (
-              <div className="text-zinc-600 text-[10px] font-mono text-center mt-10">No stored memories.</div>
+              <div className="text-slate-500 dark:text-zinc-600 text-[10px] font-mono text-center mt-10 transition-colors duration-400">No stored memories.</div>
             ) : (
               <div className="space-y-3">
                 {memories.map(m => (
-                  <div key={m.id} className="bg-black/40 border border-zinc-800 rounded p-3 relative group">
-                    <button onClick={() => deleteMemory(m.id)} className="absolute top-2 right-2 text-zinc-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div key={m.id} className="bg-white dark:bg-black/40 border border-slate-200 dark:border-zinc-800 rounded p-3 relative group shadow-sm dark:shadow-none transition-colors duration-400">
+                    <button onClick={() => deleteMemory(m.id)} className="absolute top-2 right-2 text-slate-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="square" strokeLinejoin="miter" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                     <div className="text-neon-cyan text-[10px] font-mono mb-1 font-bold">{m.key}</div>
-                    <div className="text-zinc-300 text-[10px] font-mono whitespace-pre-wrap leading-relaxed">{m.value}</div>
-                    <div className="text-zinc-600 text-[8px] font-mono mt-2 uppercase tracking-widest">Source: {m.source} • {new Date(m.timestamp).toLocaleDateString()}</div>
+                    <div className="text-slate-700 dark:text-zinc-300 text-[10px] font-mono whitespace-pre-wrap leading-relaxed transition-colors duration-400">{m.value}</div>
+                    <div className="text-slate-500 dark:text-zinc-600 text-[8px] font-mono mt-2 uppercase tracking-widest transition-colors duration-400">Source: {m.source} • {new Date(m.timestamp).toLocaleDateString()}</div>
                   </div>
                 ))}
               </div>

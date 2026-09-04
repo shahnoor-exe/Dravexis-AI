@@ -92,8 +92,8 @@ const AvatarChamber: React.FC = () => {
   }, [runStatus]);
 
   return (
-    <div ref={containerRef} className="flex flex-col items-center justify-center p-4 rounded-xl glass-panel relative overflow-hidden group">
-      <div className="absolute inset-0 grid-overlay"></div>
+    <div ref={containerRef} className="flex flex-col items-center justify-center p-4 rounded-xl bg-white/80 dark:bg-slate-glass shadow-sm dark:shadow-none border border-slate-200 dark:border-[rgba(0,240,255,0.08)] relative overflow-hidden group transition-colors duration-400">
+      <div className="absolute inset-0 grid-overlay opacity-20 dark:opacity-100"></div>
       <div className="relative z-10 w-28 h-28 mb-3">
         <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
           {/* Outer ring - dashed */}
@@ -142,7 +142,7 @@ function SubsystemCard({ icon, label, status, statusColor = "neon-cyan", glowCla
   icon: string; label: string; status: string; statusColor?: string; glowClass?: string; detail?: { message: string; action: string | null; evidence: string | null }
 }) {
   return (
-    <div className={`relative group bg-slate-glass/50 border border-zinc-800/80 rounded-sm p-2.5 flex items-center justify-between transition-all duration-300 hover:border-${statusColor}/40 ${glowClass}`}>
+    <div className={`relative group bg-white/80 dark:bg-slate-glass/50 border border-slate-200 dark:border-zinc-800/80 rounded-sm p-2.5 flex items-center justify-between transition-all duration-300 hover:border-slate-300 dark:hover:border-${statusColor}/40 ${glowClass}`}>
       <div className={`flex items-center gap-2 text-[9px] font-mono uppercase tracking-[0.15em] text-${statusColor}`}>
         <span>{icon}</span>
         <span>{label}</span>
@@ -151,12 +151,12 @@ function SubsystemCard({ icon, label, status, statusColor = "neon-cyan", glowCla
         {status}
       </div>
       {detail && (
-        <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 w-64 bg-cyber-obsidian border border-zinc-700 p-3 rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-2xl">
-          <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 bg-cyber-obsidian border-l border-b border-zinc-700 transform rotate-45"></div>
+        <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 w-64 bg-white dark:bg-cyber-obsidian border border-slate-300 dark:border-zinc-700 p-3 rounded-sm opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 shadow-lg dark:shadow-2xl">
+          <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 bg-white dark:bg-cyber-obsidian border-l border-b border-slate-300 dark:border-zinc-700 transform rotate-45"></div>
           <div className="relative z-10 text-[10px] font-mono">
             <div className={`text-${statusColor} font-bold mb-1 uppercase tracking-wider`}>{label} STATUS</div>
-            <div className="text-zinc-300 mb-2">{detail.message}</div>
-            {detail.evidence && <div className="text-zinc-500 text-[9px] mb-2 border-l border-zinc-700 pl-2">{detail.evidence}</div>}
+            <div className="text-slate-600 dark:text-zinc-300 mb-2">{detail.message}</div>
+            {detail.evidence && <div className="text-slate-500 dark:text-zinc-500 text-[9px] mb-2 border-l border-slate-300 dark:border-zinc-700 pl-2">{detail.evidence}</div>}
             {detail.action && <div className="text-neon-cyan/80 bg-neon-cyan/5 border border-neon-cyan/20 p-1 rounded-sm text-center">Required Action: {detail.action}</div>}
           </div>
         </div>
@@ -186,13 +186,13 @@ export const LeftRail: React.FC<{ width?: number }> = ({ width }) => {
 
   return (
     <aside 
-      className="left-rail flex flex-col gap-4 w-72 min-w-[18rem] max-w-[50vw] p-4 bg-cyber-obsidian border-r border-zinc-800/80 overflow-visible relative z-[60] shadow-[4px_0_24px_rgba(0,0,0,0.3)] shrink-0 transition-[width] duration-75"
+      className="left-rail flex flex-col gap-4 w-72 min-w-[18rem] max-w-[50vw] p-4 bg-slate-50 dark:bg-cyber-obsidian border-r border-slate-200 dark:border-zinc-800/80 overflow-visible relative z-[60] shadow-sm dark:shadow-[4px_0_24px_rgba(0,0,0,0.3)] shrink-0 transition-all duration-400"
     >
-      <div className="absolute inset-0 scanlines opacity-15 mix-blend-overlay pointer-events-none"></div>
+      <div className="absolute inset-0 scanlines opacity-5 dark:opacity-15 mix-blend-overlay pointer-events-none transition-opacity duration-400"></div>
 
       {/* Core Matrix */}
       <div className="relative z-10">
-        <h2 className="text-zinc-500 text-[9px] font-mono uppercase tracking-[0.2em] mb-2 flex items-center gap-2">
+        <h2 className="text-slate-500 dark:text-zinc-500 text-[9px] font-mono uppercase tracking-[0.2em] mb-2 flex items-center gap-2 transition-colors duration-400">
           <span className="w-1.5 h-1.5 bg-neon-cyan rounded-full animate-pulse"></span>
           Cognitive Core
         </h2>
@@ -200,8 +200,8 @@ export const LeftRail: React.FC<{ width?: number }> = ({ width }) => {
       </div>
 
       {/* Subsystem Matrix */}
-      <div className="relative z-10 border-t border-zinc-800/60 pt-3">
-        <h2 className="text-zinc-500 text-[9px] font-mono uppercase tracking-[0.2em] mb-2">Subsystem Status</h2>
+      <div className="relative z-10 border-t border-slate-200 dark:border-zinc-800/60 pt-3 transition-colors duration-400">
+        <h2 className="text-slate-500 dark:text-zinc-500 text-[9px] font-mono uppercase tracking-[0.2em] mb-2 transition-colors duration-400">Subsystem Status</h2>
         <div className="flex flex-col gap-1.5">
           <SubsystemCard 
             icon="🧠" label="COGNITIVE ENGINE" 
@@ -242,17 +242,17 @@ export const LeftRail: React.FC<{ width?: number }> = ({ width }) => {
       </div>
 
       {/* Agent Graph DAG */}
-      <div className="relative z-10 border-t border-zinc-800/60 pt-3 flex-1">
-        <h2 className="text-zinc-500 text-[9px] font-mono uppercase tracking-[0.2em] mb-2 flex justify-between items-center">
+      <div className="relative z-10 border-t border-slate-200 dark:border-zinc-800/60 pt-3 flex-1 transition-colors duration-400">
+        <h2 className="text-slate-500 dark:text-zinc-500 text-[9px] font-mono uppercase tracking-[0.2em] mb-2 flex justify-between items-center transition-colors duration-400">
           <span>Agent Graph DAG</span>
-          <span className="text-[7px] text-zinc-600 bg-zinc-900 px-1.5 py-0.5 rounded">LangGraph FSM</span>
+          <span className="text-[7px] text-slate-500 dark:text-zinc-600 bg-slate-200 dark:bg-zinc-900 px-1.5 py-0.5 rounded transition-colors duration-400">LangGraph FSM</span>
         </h2>
         <AgentDag onNodeSelect={setSelectedNode} />
       </div>
 
       {/* Slide-over Drilldown Drawer */}
       <div 
-        className={`absolute inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${selectedNode ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`absolute inset-0 z-40 bg-slate-900/20 dark:bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${selectedNode ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         onClick={() => setSelectedNode(null)}
       />
       <div className={`absolute inset-y-0 left-0 w-full z-50 transform transition-transform duration-300 ${selectedNode ? 'translate-x-0' : '-translate-x-full'}`}>
