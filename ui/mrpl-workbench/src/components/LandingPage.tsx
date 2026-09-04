@@ -2,9 +2,10 @@ import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useSettingsStore } from "../store/settingsStore";
 import { api } from "../lib/api";
+import { ThemeToggle } from "./ThemeToggle";
 
 export const LandingPage: React.FC = () => {
-  const { capabilities, setCapabilities, setHasInitialized, connectionStatus, setSkipIntro } = useSettingsStore();
+  const { capabilities, setCapabilities, setHasInitialized, setSkipIntro } = useSettingsStore();
   const heroRef = useRef<HTMLDivElement>(null);
   const coreRef = useRef<HTMLDivElement>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
@@ -89,10 +90,14 @@ export const LandingPage: React.FC = () => {
     handleInitialize();
   };
 
-  const isUnavailable = connectionStatus === "DISCONNECTED";
-
   return (
     <div className="landing-container block h-screen w-full bg-slate-50 dark:bg-cyber-obsidian text-slate-900 dark:text-zinc-100 relative overflow-x-hidden overflow-y-auto transition-colors duration-400">
+      
+      {/* Theme Toggle Top Right */}
+      <div className="absolute top-6 right-6 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* Backgrounds */}
       <div className="absolute inset-0 bg-radial-hero z-0 pointer-events-none transition-opacity duration-400"></div>
       <div className="scanlines z-10 opacity-10 dark:opacity-30 mix-blend-overlay"></div>
@@ -131,35 +136,19 @@ export const LandingPage: React.FC = () => {
 
         {/* Action Buttons */}
         <div ref={buttonsRef} className="flex flex-col sm:flex-row gap-4 mb-16 opacity-0">
-          {isUnavailable ? (
-            <>
-              <div className="flex items-center gap-2 px-6 py-3 border border-red-300 dark:border-red-500/50 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 font-mono text-sm uppercase tracking-wider rounded backdrop-blur shadow-sm dark:shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-                ⚠ LOCAL RUNTIME UNAVAILABLE
-              </div>
-              <button 
-                onClick={() => window.location.reload()}
-                className="px-6 py-3 border border-slate-300 dark:border-zinc-600 hover:border-slate-400 dark:hover:border-zinc-400 bg-white/50 dark:bg-zinc-800/50 hover:bg-slate-100 dark:hover:bg-zinc-700/50 text-slate-700 dark:text-white font-mono text-sm uppercase tracking-wider rounded transition-all flex items-center justify-center leading-normal"
-              >
-                Retry Connection
-              </button>
-            </>
-          ) : (
-            <>
-              <button 
-                onClick={handleInitialize}
-                className="px-8 py-3 border border-neon-cyan/80 bg-white/80 dark:bg-neon-cyan/10 hover:bg-neon-cyan/10 dark:hover:bg-neon-cyan/20 text-neon-cyan dark:text-neon-cyan hover:text-neon-cyan dark:hover:text-white font-mono text-sm uppercase tracking-wider rounded backdrop-blur transition-all duration-300 shadow-sm dark:shadow-none hover:shadow-md dark:hover:shadow-[0_0_20px_rgba(32,227,255,0.4)] group relative overflow-hidden flex items-center justify-center leading-normal"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-cyan/10 dark:via-neon-cyan/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                Initialize Workbench
-              </button>
-              <button 
-                onClick={handleSkipIntro}
-                className="px-8 py-3 border border-slate-300 dark:border-zinc-700 hover:border-slate-400 dark:hover:border-neon-cyan/50 bg-white/50 dark:bg-zinc-900/50 hover:bg-slate-100 dark:hover:bg-zinc-800/80 text-slate-600 dark:text-zinc-300 hover:text-slate-800 dark:hover:text-neon-cyan font-mono text-sm uppercase tracking-wider rounded backdrop-blur transition-all flex items-center justify-center leading-normal"
-              >
-                Skip Intro Next Time
-              </button>
-            </>
-          )}
+          <button 
+            onClick={handleInitialize}
+            className="px-8 py-3 border border-neon-cyan/80 bg-white/80 dark:bg-neon-cyan/10 hover:bg-neon-cyan/10 dark:hover:bg-neon-cyan/20 text-neon-cyan dark:text-neon-cyan hover:text-neon-cyan dark:hover:text-white font-mono text-sm uppercase tracking-wider rounded backdrop-blur transition-all duration-300 shadow-sm dark:shadow-none hover:shadow-md dark:hover:shadow-[0_0_20px_rgba(32,227,255,0.4)] group relative overflow-hidden flex items-center justify-center leading-normal cursor-pointer"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-neon-cyan/10 dark:via-neon-cyan/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+            Initialize Workbench
+          </button>
+          <button 
+            onClick={handleSkipIntro}
+            className="px-8 py-3 border border-slate-300 dark:border-zinc-700 hover:border-slate-400 dark:hover:border-neon-cyan/50 bg-white/50 dark:bg-zinc-900/50 hover:bg-slate-100 dark:hover:bg-zinc-800/80 text-slate-600 dark:text-zinc-300 hover:text-slate-800 dark:hover:text-neon-cyan font-mono text-sm uppercase tracking-wider rounded backdrop-blur transition-all flex items-center justify-center leading-normal cursor-pointer"
+          >
+            Skip Intro Next Time
+          </button>
         </div>
 
         {/* Interactive Mission Preview Nodes */}
