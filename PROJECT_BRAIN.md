@@ -700,6 +700,18 @@ COMPLETE — REHEARSED WITH LIMITATIONS; LOCAL RELEASE READY; GITHUB PUSH COMPLE
   - `AgentDag.tsx`: Restyled the React Flow graph with glowing edges and dark neon node states.
 - **Status**: The application is highly polished, secure, and ready for live presentation.
 
+### Global Dark/Light Theme System & Demo Mode (Implemented 2026-09-04)
+- **Robust Theme Engine**:
+  - Transitioned hard-coded Cyberpunk UI into a flexible Tailwind Dark/Light mode design using `dark:` variants.
+  - Implemented `useThemeStore` (Zustand) and a sleek `ThemeToggle.tsx` component.
+  - Persists theme preferences to LocalStorage (Dravexis-Theme).
+  - Maintained complete visual fidelity of "Obsidian Control Room" while introducing a highly polished, professional "Clean Industrial" Light mode.
+- **Demo Implementation Integration**:
+  - Implemented `DemoMode.tsx` providing a standalone interactive matrix for presentation.
+  - Features real-time typing simulations, network packet trace animations, and static JSON data bypasses for offline presentation reliability.
+  - Easily toggled via the `/demo` endpoint or the new UI button.
+- **GitHub Push**: Changes clean, verified, and committed to repository.
+
 ### Live LLM Synthesis & Cyberpunk Overhaul Polish — 2026-09-02
 - **Backend Cognition Fix**:
   - `src/agent/graph.py` nodes (`node_plan`, `node_compile_result`, `node_codegen`, `node_vision`) were missing calls to `switch_model()`. 
