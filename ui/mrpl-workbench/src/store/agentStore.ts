@@ -182,12 +182,21 @@ export const useAgentStore = create<AgentStore>((set) => ({
       };
     }),
 
-  failRun: (error) =>
+  failRun: (error) => {
+    // Translate raw network errors to friendly codes
+    const isNetworkError = typeof error === "string" && (
+      error.toLowerCase().includes("failed to fetch") ||
+      error.toLowerCase().includes("networkerror") ||
+      error.toLowerCase().includes("connection refused")
+    );
     set({
-      runStatus: "failed",
-      error,
+      runStatus: isNetworkError ? "disconnected" : "failed",
+      error: isNetworkError
+        ? { code: "BACKEND_OFFLINE", message: "Cannot reach backend at 127.0.0.1:8080. Please start the Dravexis backend server (launch_dravexis.bat)." }
+        : error,
       finalAnswer: null,
-    }),
+    });
+  },
 
   reset: () =>
     set({

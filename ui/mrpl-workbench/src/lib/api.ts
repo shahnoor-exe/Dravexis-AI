@@ -117,7 +117,10 @@ async function _fetch<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  health: () => _fetch<{ status: string; phase: number }>(API.health),
+  health: () => _fetch<{ status: string; service?: string; phase?: number }>(
+    API.health,
+    { signal: AbortSignal.timeout(4000) }
+  ),
 
   agentRun: (req: AgentRunRequest) =>
     _fetch<AgentRunResponse>(API.agentRun, {
@@ -147,5 +150,5 @@ export const api = {
 
   networkMonitor: () => _fetch<Record<string, unknown>>(API.networkMonitor),
 
-  capabilities: () => _fetch<Capabilities>(`${API.health}capabilities`),
+  capabilities: () => _fetch<Capabilities>(API.capabilities),
 };

@@ -336,31 +336,52 @@ export const CenterStage: React.FC = () => {
                 </div>
               </div>
             )}
-            {error && (
-              <div className="bg-red-950/40 border border-red-500/50 rounded-sm p-5 shadow-[0_0_15px_rgba(239,68,68,0.2)] relative overflow-hidden animate-fade-in">
-                <div className="absolute top-0 left-0 w-1 h-full bg-red-500 glow-red"></div>
-                <div className="flex items-center gap-2 text-red-400 font-mono text-xs tracking-widest mb-2 uppercase">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                  System Exception {typeof error === "object" && error !== null ? `[${(error as any).code}]` : ""}
+            {error && (() => {
+              const isOffline = typeof error === "object" && error !== null && (error as any).code === "BACKEND_OFFLINE";
+              const isLlamaUnreachable = typeof error === "object" && error !== null && (error as any).code === "LLAMA_SERVER_UNREACHABLE";
+              
+              if (isOffline) {
+                return (
+                  <div className="bg-slate-100/80 dark:bg-zinc-900/60 border border-slate-300 dark:border-zinc-700 rounded-sm p-5 animate-fade-in">
+                    <div className="flex items-center gap-2 text-slate-600 dark:text-zinc-400 font-mono text-xs tracking-widest mb-2 uppercase">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636a9 9 0 010 12.728M15.536 8.464a5 5 0 010 7.072M6.343 17.657a9 9 0 010-12.728M9.172 14.828a5 5 0 010-7.072M12 12h.01" /></svg>
+                      Backend Offline
+                    </div>
+                    <div className="text-slate-500 dark:text-zinc-500 text-xs font-mono mb-4">
+                      The Dravexis backend is not running. Start the backend server to process queries.
+                    </div>
+                    <div className="flex gap-3 items-center">
+                      <Button variant="ghost" size="sm" onClick={() => useAgentStore.getState().reset()} className="text-slate-500 dark:text-zinc-400 border-slate-300 dark:border-zinc-700">Dismiss</Button>
+                      <Button variant="ghost" size="sm" onClick={() => handleRunSubmit()} className="text-neon-cyan border-neon-cyan/50 hover:bg-neon-cyan/10">Retry</Button>
+                    </div>
+                  </div>
+                );
+              }
+              
+              return (
+                <div className="bg-red-950/40 border border-red-500/50 rounded-sm p-5 shadow-[0_0_15px_rgba(239,68,68,0.2)] relative overflow-hidden animate-fade-in">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-red-500 glow-red"></div>
+                  <div className="flex items-center gap-2 text-red-400 font-mono text-xs tracking-widest mb-2 uppercase">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    {isLlamaUnreachable ? "LLM Engine Unavailable" : `System Exception ${typeof error === "object" && error !== null ? `[${(error as any).code}]` : ""}`}
+                  </div>
+                  <div className="text-red-200/80 text-xs font-mono bg-black/40 p-3 rounded mb-4 border border-red-900/50">
+                    {typeof error === "object" && error !== null ? (error as any).message : String(error)}
+                  </div>
+                  <div className="flex gap-3 items-center">
+                    <Button variant="ghost" size="sm" onClick={() => useAgentStore.getState().reset()} className="text-zinc-400 border-zinc-700 hover:text-white">Dismiss</Button>
+                    <Button variant="ghost" size="sm" onClick={() => handleRunSubmit()} className="text-neon-cyan border-neon-cyan/50 hover:bg-neon-cyan/10">Retry Request</Button>
+                    {typeof error === "object" && error !== null && ((error as any).code === "MODEL_SWITCH_FAILED" || (error as any).code === "VISION_UNAVAILABLE") && (
+                      <Button variant="ghost" size="sm" onClick={() => window.location.reload()} className="text-neon-amber border-neon-amber/50 hover:bg-neon-amber/10">Recheck Capabilities</Button>
+                    )}
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-red-900/30 text-[9px] text-red-500/60 font-mono uppercase tracking-widest">
+                    <span>Verify backend connection and start_all.ps1 process</span>
+                  </div>
                 </div>
-                <div className="text-red-200/80 text-xs font-mono bg-black/40 p-3 rounded mb-4 border border-red-900/50">
-                  {typeof error === "object" && error !== null ? (error as any).message : String(error)}
-                </div>
-                <div className="flex gap-3 items-center">
-                  <Button variant="ghost" size="sm" onClick={() => useAgentStore.getState().reset()} className="text-zinc-400 border-zinc-700 hover:text-white">Dismiss</Button>
-                  <Button variant="ghost" size="sm" onClick={() => handleRunSubmit()} className="text-neon-cyan border-neon-cyan/50 hover:bg-neon-cyan/10">Retry Request</Button>
-                  {typeof error === "object" && error !== null && ((error as any).code === "MODEL_SWITCH_FAILED" || (error as any).code === "VISION_UNAVAILABLE") && (
-                    <Button variant="ghost" size="sm" onClick={() => window.location.reload()} className="text-neon-amber border-neon-amber/50 hover:bg-neon-amber/10">Recheck Capabilities</Button>
-                  )}
-                </div>
-                <div className="mt-4 pt-3 border-t border-red-900/30 text-[9px] text-red-500/60 font-mono uppercase tracking-widest flex items-center justify-between">
-                  <span>VERIFY BACKEND CONNECTION AND start_all.ps1 PROCESS</span>
-                  {typeof error === "object" && error !== null && (error as any).code === "LLAMA_SERVER_UNREACHABLE" && (
-                    <span className="text-red-400">STATUS: DISCONNECTED</span>
-                  )}
-                </div>
-              </div>
-            )}
+              );
+            })()}
+
             {finalAnswer && (runStatus === "completed" || runStatus === "partial") && (
               <div data-anim="answer-panel" className="bg-white/90 dark:bg-slate-glass/60 border border-slate-300 dark:border-neon-cyan/30 rounded-sm p-6 shadow-sm dark:shadow-[0_0_20px_rgba(32,227,255,0.1)] backdrop-blur-md relative overflow-hidden animate-fade-in transition-colors duration-400">
                 <div className="absolute top-0 left-0 w-1 h-full bg-neon-cyan glow-cyan"></div>

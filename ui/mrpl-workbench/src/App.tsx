@@ -43,7 +43,7 @@ function WorkbenchLayout({ historyOpen, setHistoryOpen, leftResizer, rightResize
   useAppLoadAnimation(); // Triggers only when WorkbenchLayout mounts
   
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-cyber-obsidian text-zinc-100">
+    <div className="flex flex-col h-screen overflow-hidden bg-cyber-bg text-text-main transition-colors duration-400">
       <div data-anim="logo">
         <TopBar onToggleHistory={() => setHistoryOpen(!historyOpen)} />
       </div>

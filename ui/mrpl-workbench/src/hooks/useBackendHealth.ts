@@ -10,7 +10,7 @@ export function useBackendHealth() {
   const check = async () => {
     try {
       const health = await api.health();
-      if (health?.status === "running") {
+      if (health?.status === "running" || health?.service === "Dravexis AI") {
         setConnectionStatus("CONNECTED");
         // Also fetch graph info for model status
         try {

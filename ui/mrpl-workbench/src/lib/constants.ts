@@ -6,6 +6,7 @@ export const LLAMA_URL = "http://127.0.0.1:8080" as const;
 
 export const API = {
   health: `${BACKEND_URL}/`,
+  capabilities: `${BACKEND_URL}/capabilities`,
   chat: `${BACKEND_URL}/chat`,
   ingest: `${BACKEND_URL}/ingest`,
   networkStatus: `${BACKEND_URL}/network-status`,
